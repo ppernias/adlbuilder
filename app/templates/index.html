@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}ADL Builder - Home{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-8 text-center">
+    <h1 class="text-4xl font-bold text-teal-500 mb-6">Welcome to ADL Builder</h1>
+    <p class="text-xl mb-8">An application to create and edit AI-based assistants defined through YAML files.</p>
+    
+    <div id="unauthenticated-content" class="bg-white rounded-lg shadow-md p-8 mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Start working with your assistants</h2>
+        <p class="mb-6">To start using ADL Builder, log in or register if you don't have an account yet.</p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a href="/login" class="bg-teal-500 hover:bg-teal-600 text-white py-2 px-6 rounded-lg transition duration-300">Log In</a>
+            <a href="/register" class="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-6 rounded-lg transition duration-300">Register</a>
+        </div>
+    </div>
+    
+    <div id="authenticated-content" style="display: none;" class="bg-white rounded-lg shadow-md p-8">
+        <h2 class="text-2xl font-semibold mb-4">Your Dashboard</h2>
+        <p class="mb-6">Quickly access the main features:</p>
+        <div class="grid grid-cols-1 md:grid-cols-{% if not openai_configured and not profile_complete %}3{% elif not openai_configured or not profile_complete %}2{% else %}1{% endif %} gap-6">
+            <a href="/assistants" class="bg-white border border-teal-500 p-6 rounded-lg shadow-sm hover:shadow-md transition duration-300">
+                <h3 class="text-xl font-medium text-teal-500 mb-2">Assistants</h3>
+                <p class="text-gray-600">Manage, create and edit your AI-based assistants</p>
+            </a>
+            {% if not openai_configured %}
+            <a href="/openai-config" class="bg-white border border-yellow-500 p-6 rounded-lg shadow-sm hover:shadow-md transition duration-300">
+                <h3 class="text-xl font-medium text-yellow-500 mb-1">
+                    OpenAI Configuration
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-500 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </h3>
+                <p class="text-sm text-gray-500 italic mb-1">(optional)</p>
+                <p class="text-gray-600">Configure your API Key and select the models to use to improve descriptions and tools</p>
+            </a>
+            {% endif %}
+            {% if not profile_complete %}
+            <a href="/profile" class="bg-white border border-yellow-500 p-6 rounded-lg shadow-sm hover:shadow-md transition duration-300">
+                <h3 class="text-xl font-medium text-yellow-500 mb-1">
+                    Profile
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-500 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </h3>
+                <p class="text-sm text-gray-500 italic mb-1">(Mandatory)</p>
+                <p class="text-gray-600">Complete your profile with Role, Organization and other default data</p>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if user is authenticated
+        const token = localStorage.getItem('token');
+        const cookieToken = getCookie('access_token');
+        
+        if (token || cookieToken) {
+            document.getElementById('authenticated-content').style.display = 'block';
+            document.getElementById('unauthenticated-content').style.display = 'none';
+            // Update menu visibility
+            updateAuthenticationUI(true);
+        } else {
+            document.getElementById('authenticated-content').style.display = 'none';
+            document.getElementById('unauthenticated-content').style.display = 'block';
+            // Update menu visibility
+            updateAuthenticationUI(false);
+        }
+    });
+    
+    // Helper function to get cookie value by name
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+</script>
+{% endblock %}

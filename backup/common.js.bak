@@ -1,0 +1,145 @@
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/*!*********************************!*\
+  !*** ./app/static/ts/common.ts ***!
+  \*********************************/
+
+/**
+ * ADL Builder - Common TypeScript Functions
+ */
+// Authentication Functions
+function updateAuthenticationUI(isAuthenticated) {
+    // Update desktop menu
+    var authenticatedMenu = document.getElementById('authenticated-menu');
+    var unauthenticatedMenu = document.getElementById('unauthenticated-menu');
+    if (authenticatedMenu && unauthenticatedMenu) {
+        if (isAuthenticated) {
+            authenticatedMenu.style.display = 'flex';
+            unauthenticatedMenu.style.display = 'none';
+        }
+        else {
+            authenticatedMenu.style.display = 'none';
+            unauthenticatedMenu.style.display = 'flex';
+        }
+    }
+    // Update mobile menu
+    var authenticatedMobileMenu = document.getElementById('authenticated-mobile-menu');
+    var unauthenticatedMobileMenu = document.getElementById('unauthenticated-mobile-menu');
+    if (authenticatedMobileMenu && unauthenticatedMobileMenu) {
+        if (isAuthenticated) {
+            authenticatedMobileMenu.style.display = 'block';
+            unauthenticatedMobileMenu.style.display = 'none';
+        }
+        else {
+            authenticatedMobileMenu.style.display = 'none';
+            unauthenticatedMobileMenu.style.display = 'block';
+        }
+    }
+}
+// Add event listeners for logout buttons
+document.addEventListener('DOMContentLoaded', function () {
+    // Toggle mobile menu
+    var mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    var mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenuBtn && mobileMenu) {
+        mobileMenuBtn.addEventListener('click', function () {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+    // Logout functionality
+    var logoutBtn = document.getElementById('logout-btn');
+    var logoutMobileBtn = document.getElementById('logout-mobile-btn');
+    var handleLogout = function () {
+        // Clear token
+        localStorage.removeItem('token');
+        // Show notification
+        showNotification('You have successfully logged out', 'success');
+        // Update UI
+        updateAuthenticationUI(false);
+        // Redirect to home page
+        setTimeout(function () {
+            window.location.href = '/';
+        }, 1000);
+    };
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
+    if (logoutMobileBtn) {
+        logoutMobileBtn.addEventListener('click', handleLogout);
+    }
+    // Check authentication on page load
+    var token = localStorage.getItem('token');
+    updateAuthenticationUI(!!token);
+});
+/**
+ * Show a notification to the user
+ * @param {string} message - The message to display
+ * @param {string} type - 'success', 'error', 'warning', or 'info'
+ * @param {number} duration - Duration in milliseconds (default: 5000)
+ */
+function showNotification(message, type, duration) {
+    if (type === void 0) { type = 'info'; }
+    if (duration === void 0) { duration = 5000; }
+    var container = document.getElementById('notification-container');
+    if (!container)
+        return;
+    // Create notification element
+    var notification = document.createElement('div');
+    notification.className = 'notification mb-3 p-3 rounded-md shadow-md max-w-md transition-all duration-300 transform translate-x-full';
+    // Set background color based on type
+    switch (type) {
+        case 'success':
+            notification.classList.add('bg-green-100', 'border-l-4', 'border-green-500', 'text-green-700');
+            break;
+        case 'error':
+            notification.classList.add('bg-red-100', 'border-l-4', 'border-red-500', 'text-red-700');
+            break;
+        case 'warning':
+            notification.classList.add('bg-yellow-100', 'border-l-4', 'border-yellow-500', 'text-yellow-700');
+            break;
+        case 'info':
+        default:
+            notification.classList.add('bg-blue-100', 'border-l-4', 'border-blue-500', 'text-blue-700');
+    }
+    // Create content
+    notification.innerHTML = "\n        <div class=\"flex justify-between items-start\">\n            <div>".concat(message, "</div>\n            <button class=\"ml-4 text-gray-500 hover:text-gray-700 focus:outline-none\" aria-label=\"Close\">\n                <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n                    <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\" />\n                </svg>\n            </button>\n        </div>\n    ");
+    // Add notification to container
+    container.appendChild(notification);
+    // Add close button event listener
+    var closeButton = notification.querySelector('button');
+    if (closeButton) {
+        closeButton.addEventListener('click', function () {
+            removeNotification(notification);
+        });
+    }
+    // Animate in
+    setTimeout(function () {
+        notification.classList.remove('translate-x-full');
+    }, 10);
+    // Auto remove after duration
+    setTimeout(function () {
+        removeNotification(notification);
+    }, duration);
+}
+/**
+ * Remove a notification with animation
+ * @param {HTMLElement} notification - The notification element to remove
+ */
+function removeNotification(notification) {
+    // Animate out
+    notification.classList.add('translate-x-full', 'opacity-0');
+    // Remove from DOM after animation
+    setTimeout(function () {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 300);
+}
+// Export functions to make them available globally
+window.updateAuthenticationUI = updateAuthenticationUI;
+window.showNotification = showNotification;
+window.removeNotification = removeNotification;
+
+/******/ })()
+;
+//# sourceMappingURL=common.js.map

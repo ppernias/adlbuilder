@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}ADL Builder - {{ mode|title }} Assistant{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/yaml/yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/lint.min.js"></script>
+<style>
+    .CodeMirror {
+        height: 500px;
+        border: 1px solid #ddd;
+        border-radius: 0.375rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto mt-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-teal-500">{{ mode|title }} Assistant</h1>
+        <a href="/assistants" class="text-teal-500 hover:text-teal-700">
+            &larr; Back to List
+        </a>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <form id="assistant-form" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Assistant Name</label>
+                    <input type="text" id="name" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <input type="text" id="description" name="description" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="yaml-editor" class="block text-sm font-medium text-gray-700 mb-1">YAML Content</label>
+                <textarea id="yaml-editor" name="yaml_content" class="hidden"></textarea>
+                <div id="editor-container"></div>
+                <p class="text-xs text-gray-500 mt-1">YAML content must follow the defined assistant schema.</p>
+            </div>
+            
+            <div class="flex justify-between items-center">
+                <div id="validation-status"></div>
+                <div class="space-x-3">
+                    <button type="button" id="validate-btn" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300">
+                        Validate YAML
+                    </button>
+                    <button type="submit" id="save-btn" class="bg-teal-500 text-white py-2 px-4 rounded-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition duration-300 disabled:opacity-50" disabled>
+                        Save Assistant
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        // Check if user is authenticated
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login';
+            return;
+        }
+        
+        // Update menu visibility
+        updateAuthenticationUI(true);
+        
+        // Variables for storing current assistant ID (for edit mode)
+        let currentAssistantId = null;
+        let isEditMode = false;
+        
+        // Initialize CodeMirror editor
+        const yamlTextarea = document.getElementById('yaml-editor');
+        const editor = CodeMirror(document.getElementById('editor-container'), {
+            mode: 'yaml',
+            theme: 'dracula',
+            lineNumbers: true,
+            indentUnit: 2,
+            tabSize: 2,
+            lineWrapping: true,
+            styleActiveLine: true
+        });
+        
+        // Set default template if creating new assistant
+        const defaultTemplate = `# Assistant Definition
+name: mi_asistente
+description: Mi asistente de IA
+version: 1.0.0
+model: gpt-4
+prompt: |
+  You are a very helpful and friendly assistant.
+  
+  Respond to user questions in a concise and precise manner.
+  
+  Always be polite and respectful.
+system_prompt: |
+  Greet the user at the beginning of the conversation. Introduce yourself as an AI assistant.
+`;
+        
+        // Check if we're in import mode
+        const urlParams = new URLSearchParams(window.location.search);
+        const mode = urlParams.get('mode');
+        
+        if (mode === 'import') {
+            // Get imported YAML from sessionStorage
+            const importedYaml = sessionStorage.getItem('temp_yaml_content');
+            const importedName = sessionStorage.getItem('temp_yaml_name');
+            
+            if (importedYaml) {
+                editor.setValue(importedYaml);
+                document.getElementById('name').value = importedName || '';
+                
+                // Clear sessionStorage after use
+                sessionStorage.removeItem('temp_yaml_content');
+                sessionStorage.removeItem('temp_yaml_name');
+                
+                // Validate imported YAML
+                await validateYaml();
+            } else {
+                // If no imported content, use default template
+                editor.setValue(defaultTemplate);
+            }
+        } else if (urlParams.has('id')) {
+            // We're in edit mode, load the assistant data
+            isEditMode = true;
+            currentAssistantId = urlParams.get('id');
+            
+            try {
+                const response = await fetch(`/api/v1/assistants/${currentAssistantId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const assistant = await response.json();
+                    
+                    // Fill the form with assistant data
+                    document.getElementById('name').value = assistant.name || '';
+                    document.getElementById('description').value = assistant.description || '';
+                    editor.setValue(assistant.yaml_content || '');
+                    
+                    // Validate the YAML
+                    await validateYaml();
+                } else {
+                    showNotification('Error al cargar el asistente', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading assistant:', error);
+                showNotification('Connection error', 'error');
+            }
+        } else {
+            // New assistant, use default template
+            editor.setValue(defaultTemplate);
+        }
+        
+        // Update textarea value when editor changes
+        editor.on('change', function() {
+            yamlTextarea.value = editor.getValue();
+        });
+        
+        // Initial value
+        yamlTextarea.value = editor.getValue();
+        
+        // Handle validation button click
+        document.getElementById('validate-btn').addEventListener('click', validateYaml);
+        
+        // Validate YAML function
+        async function validateYaml() {
+            const yamlContent = editor.getValue();
+            const validationStatus = document.getElementById('validation-status');
+            const saveBtn = document.getElementById('save-btn');
+            
+            try {
+                const response = await fetch('/api/v1/assistants/validate', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        yaml_content: yamlContent
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.valid) {
+                    // Display success message
+                    validationStatus.innerHTML = `
+                        <div class="flex items-center text-green-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            <span>Valid YAML</span>
+                        </div>
+                    `;
+                    
+                    // Enable save button
+                    saveBtn.disabled = false;
+                } else {
+                    // Display error message
+                    let errorMsg = '<div class="text-red-600"><span class="font-bold">Invalid YAML:</span>';
+                    
+                    if (data.errors && data.errors.length > 0) {
+                        errorMsg += '<ul class="list-disc list-inside pl-2 mt-1">';
+                        data.errors.forEach(error => {
+                            errorMsg += `<li>${error}</li>`;
+                        });
+                        errorMsg += '</ul>';
+                    } else {
+                        errorMsg += '<p>Unknown validation error</p>';
+                    }
+                    
+                    errorMsg += '</div>';
+                    
+                    validationStatus.innerHTML = errorMsg;
+                    
+                    // Disable save button
+                    saveBtn.disabled = true;
+                }
+            } catch (error) {
+                console.error('Error validating YAML:', error);
+                validationStatus.innerHTML = `
+                    <div class="text-red-600">
+                        <span class="font-bold">Connection error during validation</span>
+                    </div>
+                `;
+                
+                // Disable save button
+                saveBtn.disabled = true;
+            }
+        }
+        
+        // Handle form submission
+        document.getElementById('assistant-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const description = document.getElementById('description').value;
+            const yamlContent = editor.getValue();
+            
+            // Prepare request data
+            const assistantData = {
+                name: name,
+                description: description,
+                yaml_content: yamlContent
+            };
+            
+            // Determine if we're creating or updating
+            let url = '/api/v1/assistants/';
+            let method = 'POST';
+            
+            if (isEditMode && currentAssistantId) {
+                url = `/api/v1/assistants/${currentAssistantId}`;
+                method = 'PUT';
+            }
+            
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(assistantData)
+                });
+                
+                if (response.ok) {
+                    showNotification(`Assistant ${isEditMode ? 'updated' : 'created'} successfully`, 'success');
+                    
+                    // Redirect to assistants list after a short delay
+                    setTimeout(() => {
+                        window.location.href = '/assistants';
+                    }, 1500);
+                } else {
+                    const data = await response.json();
+                    showNotification(`Error ${isEditMode ? 'updating' : 'creating'} assistant: ${data.detail || 'An error occurred'}`, 'error');
+                }
+            } catch (error) {
+                console.error(`Error ${isEditMode ? 'updating' : 'creating'} assistant:`, error);
+                showNotification('Connection error', 'error');
+            }
+        });
+    });
+</script>
+{% endblock %}
