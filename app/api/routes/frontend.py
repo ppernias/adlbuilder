@@ -226,6 +226,30 @@ async def assistants_list(request: Request, db=Depends(get_db)):
     )
 
 
+@router.get("/assistants/editor", response_class=HTMLResponse)
+async def assistant_editor(request: Request, db=Depends(get_db)):
+    """Render the assistant editor selection page"""
+    # Try to get current user from cookie
+    current_user = deps.get_current_user_from_cookie(request, db)
+    openai_configured = False
+    profile_complete = False
+    
+    if current_user:
+        openai_configured = get_openai_config_status(db, current_user.id)
+        profile_complete = get_profile_completion_status(db, current_user.id)
+    
+    return templates.TemplateResponse(
+        "assistant_editor.html",
+        {
+            "request": request, 
+            "now": datetime.datetime.now(),
+            "openai_configured": openai_configured,
+            "profile_complete": profile_complete,
+            "current_user": current_user
+        }
+    )
+
+
 @router.get("/assistants/new", response_class=HTMLResponse)
 async def new_assistant(request: Request, db=Depends(get_db)):
     """Render the new assistant form"""

@@ -3,7 +3,8 @@ const path = require('path');
 module.exports = {
   mode: 'development',
   entry: {
-    common: './app/static/ts/common.ts'
+    common: './app/static/ts/common.ts',
+    assistant_editor: './app/static/ts/assistant_editor.ts'
   },
   output: {
     filename: '[name].js',

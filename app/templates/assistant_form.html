@@ -1,60 +1,229 @@
 {% extends "base.html" %}
 
-{% block title %}ADL Builder - {{ mode|title }} Assistant{% endblock %}
-
-{% block head %}
-{{ super() }}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/yaml/yaml.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/lint.min.js"></script>
-<style>
-    .CodeMirror {
-        height: 500px;
-        border: 1px solid #ddd;
-        border-radius: 0.375rem;
-    }
-</style>
-{% endblock %}
+{% block title %}{{ 'Edit' if mode == 'edit' else 'New' }} Assistant{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto mt-8">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-teal-500">{{ mode|title }} Assistant</h1>
-        <a href="/assistants" class="text-teal-500 hover:text-teal-700">
-            &larr; Back to List
-        </a>
-    </div>
-    
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <form id="assistant-form" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="form-group">
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Assistant Name</label>
-                    <input type="text" id="name" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" required>
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-5xl mx-auto bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold mb-6">{{ 'Edit' if mode == 'edit' else 'Create New' }} Assistant</h1>
+        
+        <form id="assistant-form" class="space-y-6" method="POST">
+            <div class="flex justify-end mb-4">
+                <label class="inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="minor-changes" class="sr-only peer">
+                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
+                    <span class="ml-3 text-sm font-medium text-gray-700">Minor Changes (Don't update history)</span>
+                </label>
+            </div>
+            
+            <!-- Tabs Navigation -->
+            <div class="flex justify-between items-center mb-6">
+                <div class="border-b border-gray-200">
+                    <ul class="flex flex-wrap -mb-px">
+                        <li class="mr-2">
+                            <a href="#" class="tab active" data-tab="metadata">Metadata</a>
+                        </li>
+                        <li class="mr-2">
+                            <a href="#" class="tab" data-tab="instructions">Assistant Instructions</a>
+                        </li>
+                        <li class="mr-2">
+                            <a href="#" class="tab" data-tab="tools">Tools</a>
+                        </li>
+                        <li>
+                            <a href="#" class="tab" data-tab="yaml">YAML</a>
+                        </li>
+                    </ul>
                 </div>
-                
-                <div class="form-group">
-                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <input type="text" id="description" name="description" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <button type="button" id="load-template-btn" class="bg-teal-500 text-white py-2 px-4 rounded-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition duration-300">
+                    Load Template
+                </button>
+            </div>
+            
+            <!-- Tab Contents -->
+            <!-- YAML Tab Content -->
+            <div class="tab-content" id="yaml-tab">
+                <div class="space-y-4">
+                    <div class="border border-gray-300 rounded-md p-4">
+                        <div class="mb-4">
+                            <h3 class="text-lg font-medium mb-2">YAML Editor</h3>
+                            <p class="text-sm text-gray-600">Edit your assistant configuration directly in YAML format.</p>
+                        </div>
+                        <textarea id="yaml-editor" class="w-full" rows="20"></textarea>
+                        <div class="flex justify-between mt-4">
+                            <div class="flex space-x-2">
+                                <button type="button" id="copy-yaml-btn" class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-300" title="Copiar al portapapeles">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                                    Copiar
+                                </button>
+                                <button type="button" id="validate-yaml-btn" class="bg-teal-500 text-white py-2 px-4 rounded-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition duration-300">
+                                    Validate YAML
+                                </button>
+                            </div>
+                            <div id="validation-status" class="flex-1 ml-4 flex items-center">
+                                <span class="text-gray-500 text-sm italic">Escribe YAML válido y se validará automáticamente</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <div class="form-group">
-                <label for="yaml-editor" class="block text-sm font-medium text-gray-700 mb-1">YAML Content</label>
-                <textarea id="yaml-editor" name="yaml_content" class="hidden"></textarea>
-                <div id="editor-container"></div>
-                <p class="text-xs text-gray-500 mt-1">YAML content must follow the defined assistant schema.</p>
+            <div class="tab-content active" id="metadata-tab">
+                <!-- Metadata Tab Content -->
+                <div class="space-y-4">
+                    <!-- Basic Section -->
+                    <div class="accordion-header" data-section="basic">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-medium">Basic Information</h3>
+                            <button type="button" class="accordion-toggle">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="accordion-content" data-section="basic">
+                        <div class="space-y-4 p-4 bg-gray-50 rounded-md">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
+                                    <input type="text" id="name" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-teal-500 focus:border-teal-500" required>
+                                </div>
+                                <div>
+                                    <label for="version" class="block text-sm font-medium text-gray-700 mb-1">Version</label>
+                                    <input type="text" id="version" name="version" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-teal-500 focus:border-teal-500" placeholder="e.g., 1.0.0">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-teal-500 focus:border-teal-500" placeholder="Brief description of the assistant"></textarea>
+                            </div>
+                            <div>
+                                <label for="model" class="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                                <input type="text" id="model" name="model" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-teal-500 focus:border-teal-500" placeholder="e.g., gpt-4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="instructions-tab">
+                <!-- Instructions Tab Content -->
+                <div class="space-y-4">
+                    <!-- Prompts Section -->
+                    <div class="accordion-header" data-section="prompts">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-medium">Prompts</h3>
+                            <button type="button" class="accordion-toggle">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="accordion-content" data-section="prompts">
+                        <div class="space-y-4 p-4 bg-gray-50 rounded-md">
+                            <div>
+                                <label for="prompt" class="block text-sm font-medium text-gray-700 mb-1">Prompt</label>
+                                <textarea id="prompt" name="prompt" rows="5" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-teal-500 focus:border-teal-500" placeholder="Main prompt for the assistant"></textarea>
+                            </div>
+                            <div>
+                                <label for="system_prompt" class="block text-sm font-medium text-gray-700 mb-1">System Prompt</label>
+                                <textarea id="system_prompt" name="system_prompt" rows="5" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-teal-500 focus:border-teal-500" placeholder="System prompt for the assistant"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tools-tab">
+                <!-- Tools Tab Content -->
+                <div class="space-y-4">
+                    <!-- Commands Section -->
+                    <div class="accordion-header" data-section="commands">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-medium">Commands</h3>
+                            <button type="button" class="accordion-toggle">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="accordion-content" data-section="commands">
+                        <div class="space-y-4 p-4 bg-gray-50 rounded-md">
+                            <p class="text-sm text-gray-600 mb-4">Commands that the assistant can execute.</p>
+                            <div id="commands-container" class="space-y-4">
+                                <!-- Command items will be added here dynamically -->
+                            </div>
+                            <button type="button" id="add-command-btn" class="mt-4 bg-teal-500 text-white py-2 px-4 rounded-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition duration-300">
+                                Add Command
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Options Section -->
+                    <div class="accordion-header" data-section="options">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-medium">Options</h3>
+                            <button type="button" class="accordion-toggle">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="accordion-content" data-section="options">
+                        <div class="space-y-4 p-4 bg-gray-50 rounded-md">
+                            <p class="text-sm text-gray-600 mb-4">Options that can be configured for the assistant.</p>
+                            <div id="options-container" class="space-y-4">
+                                <!-- Option items will be added here dynamically -->
+                            </div>
+                            <button type="button" id="add-option-btn" class="mt-4 bg-teal-500 text-white py-2 px-4 rounded-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition duration-300">
+                                Add Option
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Decorators Section -->
+                    <div class="accordion-header" data-section="decorators">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-medium">Decorators</h3>
+                            <button type="button" class="accordion-toggle">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="accordion-content" data-section="decorators">
+                        <div class="space-y-4 p-4 bg-gray-50 rounded-md">
+                            <p class="text-sm text-gray-600 mb-4">Decorators for the assistant's output.</p>
+                            <div id="decorators-container" class="space-y-4">
+                                <!-- Decorator items will be added here dynamically -->
+                            </div>
+                            <button type="button" id="add-decorator-btn" class="mt-4 bg-teal-500 text-white py-2 px-4 rounded-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition duration-300">
+                                Add Decorator
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <div class="flex justify-between items-center">
+            <!-- Hidden fields -->
+            <input type="hidden" id="form-mode" value="{{ mode }}">
+            <input type="hidden" id="assistant-id" value="{{ assistant.id if assistant else '' }}">
+            <input type="hidden" id="yaml-content" name="yaml_content">
+            
+            <!-- Form Actions -->
+            <div class="flex justify-between items-center mt-8">
                 <div id="validation-status"></div>
                 <div class="space-x-3">
                     <button type="button" id="validate-btn" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300">
-                        Validate YAML
+                        Validate
                     </button>
-                    <button type="submit" id="save-btn" class="bg-teal-500 text-white py-2 px-4 rounded-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition duration-300 disabled:opacity-50" disabled>
+                    <button type="submit" id="save-btn" class="bg-teal-500 text-white py-2 px-4 rounded-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition duration-300 disabled:opacity-50">
                         Save Assistant
                     </button>
                 </div>
@@ -65,236 +234,17 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', async function() {
-        // Check if user is authenticated
-        const token = localStorage.getItem('token');
-        if (!token) {
-            window.location.href = '/login';
-            return;
-        }
-        
-        // Update menu visibility
-        updateAuthenticationUI(true);
-        
-        // Variables for storing current assistant ID (for edit mode)
-        let currentAssistantId = null;
-        let isEditMode = false;
-        
-        // Initialize CodeMirror editor
-        const yamlTextarea = document.getElementById('yaml-editor');
-        const editor = CodeMirror(document.getElementById('editor-container'), {
-            mode: 'yaml',
-            theme: 'dracula',
-            lineNumbers: true,
-            indentUnit: 2,
-            tabSize: 2,
-            lineWrapping: true,
-            styleActiveLine: true
-        });
-        
-        // Set default template if creating new assistant
-        const defaultTemplate = `# Assistant Definition
-name: mi_asistente
-description: Mi asistente de IA
-version: 1.0.0
-model: gpt-4
-prompt: |
-  You are a very helpful and friendly assistant.
-  
-  Respond to user questions in a concise and precise manner.
-  
-  Always be polite and respectful.
-system_prompt: |
-  Greet the user at the beginning of the conversation. Introduce yourself as an AI assistant.
-`;
-        
-        // Check if we're in import mode
-        const urlParams = new URLSearchParams(window.location.search);
-        const mode = urlParams.get('mode');
-        
-        if (mode === 'import') {
-            // Get imported YAML from sessionStorage
-            const importedYaml = sessionStorage.getItem('temp_yaml_content');
-            const importedName = sessionStorage.getItem('temp_yaml_name');
-            
-            if (importedYaml) {
-                editor.setValue(importedYaml);
-                document.getElementById('name').value = importedName || '';
-                
-                // Clear sessionStorage after use
-                sessionStorage.removeItem('temp_yaml_content');
-                sessionStorage.removeItem('temp_yaml_name');
-                
-                // Validate imported YAML
-                await validateYaml();
-            } else {
-                // If no imported content, use default template
-                editor.setValue(defaultTemplate);
-            }
-        } else if (urlParams.has('id')) {
-            // We're in edit mode, load the assistant data
-            isEditMode = true;
-            currentAssistantId = urlParams.get('id');
-            
-            try {
-                const response = await fetch(`/api/v1/assistants/${currentAssistantId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const assistant = await response.json();
-                    
-                    // Fill the form with assistant data
-                    document.getElementById('name').value = assistant.name || '';
-                    document.getElementById('description').value = assistant.description || '';
-                    editor.setValue(assistant.yaml_content || '');
-                    
-                    // Validate the YAML
-                    await validateYaml();
-                } else {
-                    showNotification('Error al cargar el asistente', 'error');
-                }
-            } catch (error) {
-                console.error('Error loading assistant:', error);
-                showNotification('Connection error', 'error');
-            }
-        } else {
-            // New assistant, use default template
-            editor.setValue(defaultTemplate);
-        }
-        
-        // Update textarea value when editor changes
-        editor.on('change', function() {
-            yamlTextarea.value = editor.getValue();
-        });
-        
-        // Initial value
-        yamlTextarea.value = editor.getValue();
-        
-        // Handle validation button click
-        document.getElementById('validate-btn').addEventListener('click', validateYaml);
-        
-        // Validate YAML function
-        async function validateYaml() {
-            const yamlContent = editor.getValue();
-            const validationStatus = document.getElementById('validation-status');
-            const saveBtn = document.getElementById('save-btn');
-            
-            try {
-                const response = await fetch('/api/v1/assistants/validate', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        yaml_content: yamlContent
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok && data.valid) {
-                    // Display success message
-                    validationStatus.innerHTML = `
-                        <div class="flex items-center text-green-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                            </svg>
-                            <span>Valid YAML</span>
-                        </div>
-                    `;
-                    
-                    // Enable save button
-                    saveBtn.disabled = false;
-                } else {
-                    // Display error message
-                    let errorMsg = '<div class="text-red-600"><span class="font-bold">Invalid YAML:</span>';
-                    
-                    if (data.errors && data.errors.length > 0) {
-                        errorMsg += '<ul class="list-disc list-inside pl-2 mt-1">';
-                        data.errors.forEach(error => {
-                            errorMsg += `<li>${error}</li>`;
-                        });
-                        errorMsg += '</ul>';
-                    } else {
-                        errorMsg += '<p>Unknown validation error</p>';
-                    }
-                    
-                    errorMsg += '</div>';
-                    
-                    validationStatus.innerHTML = errorMsg;
-                    
-                    // Disable save button
-                    saveBtn.disabled = true;
-                }
-            } catch (error) {
-                console.error('Error validating YAML:', error);
-                validationStatus.innerHTML = `
-                    <div class="text-red-600">
-                        <span class="font-bold">Connection error during validation</span>
-                    </div>
-                `;
-                
-                // Disable save button
-                saveBtn.disabled = true;
-            }
-        }
-        
-        // Handle form submission
-        document.getElementById('assistant-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('name').value;
-            const description = document.getElementById('description').value;
-            const yamlContent = editor.getValue();
-            
-            // Prepare request data
-            const assistantData = {
-                name: name,
-                description: description,
-                yaml_content: yamlContent
-            };
-            
-            // Determine if we're creating or updating
-            let url = '/api/v1/assistants/';
-            let method = 'POST';
-            
-            if (isEditMode && currentAssistantId) {
-                url = `/api/v1/assistants/${currentAssistantId}`;
-                method = 'PUT';
-            }
-            
-            try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(assistantData)
-                });
-                
-                if (response.ok) {
-                    showNotification(`Assistant ${isEditMode ? 'updated' : 'created'} successfully`, 'success');
-                    
-                    // Redirect to assistants list after a short delay
-                    setTimeout(() => {
-                        window.location.href = '/assistants';
-                    }, 1500);
-                } else {
-                    const data = await response.json();
-                    showNotification(`Error ${isEditMode ? 'updating' : 'creating'} assistant: ${data.detail || 'An error occurred'}`, 'error');
-                }
-            } catch (error) {
-                console.error(`Error ${isEditMode ? 'updating' : 'creating'} assistant:`, error);
-                showNotification('Connection error', 'error');
-            }
-        });
-    });
-</script>
+<!-- Include CodeMirror for YAML editing -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/yaml/yaml.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+
+<!-- Include js-yaml for YAML parsing -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+
+<!-- Create notification container -->
+<div id="notification-container" class="fixed top-4 right-4 z-50 flex flex-col items-end space-y-2"></div>
+
+<!-- Include our TypeScript compiled file -->
+<script src="/static/js/assistant_editor.js"></script>
 {% endblock %}

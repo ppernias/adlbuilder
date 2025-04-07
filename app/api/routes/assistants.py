@@ -225,3 +225,14 @@ def download_assistant(
         media_type="application/x-yaml",
         background=lambda: os.remove(tmp_path)  # Clean up the temporary file
     )
+
+
+@router.get("/template", response_model=schemas.YAMLContent)
+def get_assistant_template(
+    current_user: models.User = Depends(deps.get_current_user),
+) -> Any:
+    """
+    Get a default assistant template.
+    """
+    template = yaml_service.get_default_template()
+    return template

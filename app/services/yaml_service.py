@@ -189,3 +189,37 @@ class YAMLService:
             return YAMLService.dump_yaml(data)
         except Exception as e:
             raise ValueError(f"Error updating assistant history: {str(e)}")
+    
+    @staticmethod
+    def get_default_template() -> Dict[str, Any]:
+        """Generate a default assistant template"""
+        default_template = {
+            "name": "mi_asistente",
+            "description": "Mi asistente de IA",
+            "version": "1.0.0",
+            "model": "gpt-4",
+            "prompt": "You are a very helpful and friendly assistant.\n\nRespond to user questions in a concise and precise manner.\n\nAlways be polite and respectful.",
+            "system_prompt": "Greet the user at the beginning of the conversation. Introduce yourself as an AI assistant.",
+            "tools": {
+                "commands": [
+                    {
+                        "name": "help",
+                        "description": "Muestra información de ayuda sobre el asistente",
+                        "usage": "/help"
+                    }
+                ],
+                "options": [
+                    {
+                        "name": "language",
+                        "description": "Idioma de respuesta del asistente",
+                        "type": "string",
+                        "default": "es"
+                    }
+                ],
+                "decorators": []
+            }
+        }
+        
+        return {
+            "yaml_content": YAMLService.dump_yaml(default_template)
+        }
