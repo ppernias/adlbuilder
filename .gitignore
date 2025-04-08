@@ -1,0 +1,73 @@
+# Entornos virtuales
+venv/
+env/
+.env/
+
+# Archivos de cach de Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Archivos de distribución
+dist/
+build/
+*.egg-info/
+
+# Archivos de base de datos y SQLite
+*.db
+*.sqlite3
+*.sqlite
+
+# Archivos de log
+*.log
+logs/
+
+# Archivos temporales
+*.tmp
+*.bak
+*.swp
+*~
+
+# Archivos de configuración local
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Dependencias de Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos de construcción de TypeScript
+*.js.map
+
+# Archivos de IDE y editores
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+
+# Archivos de cobertura de código
+.coverage
+htmlcov/
+
+# Archivos temporales generados por pruebas
+.hypothesis/
+.tox/
+
+# Archivos de migración generados automáticamente
+migrations/versions/__pycache__/
+
+# Archivos específicos del proyecto que no deben ser versionados
+# Añade aquí cualquier archivo especico de tu proyecto que no quieras versionar
+
+# IMPORTANTE: NO ignorar archivos de prueba (test_*.py)
+# Estos son parte integral del proyecto y deben incluirse en el repositorio
+
+# Mantener archivos importantes incluso si están en directorios ignorados
+!.gitkeep

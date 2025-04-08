@@ -9,6 +9,42 @@ import { loadTemplate } from './yaml-utils';
 const customWindow = window as CustomWindow;
 
 /**
+ * Activa una pestaña específica
+ * @param tabId ID de la pestaña a activar (sin el sufijo '-tab')
+ */
+export function activateTab(tabId: string): void {
+    // Deactivate all tabs
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+        tab.classList.remove('active');
+        // Eliminar estilos específicos de pestaña activa
+        tab.classList.remove('text-teal-600');
+        tab.classList.remove('border-teal-600');
+        tab.classList.add('border-transparent');
+    });
+    
+    // Hide all tab contents
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(content => content.classList.add('hidden'));
+    
+    // Activate target tab
+    const targetTab = document.querySelector(`[data-tab="${tabId}"]`);
+    if (targetTab) {
+        targetTab.classList.add('active');
+        // Aplicar estilos específicos de pestaña activa
+        targetTab.classList.add('text-teal-600');
+        targetTab.classList.add('border-teal-600');
+        targetTab.classList.remove('border-transparent');
+    }
+    
+    // Show corresponding tab content
+    const targetContent = document.getElementById(`${tabId}-content`);
+    if (targetContent) {
+        targetContent.classList.remove('hidden');
+    }
+}
+
+/**
  * Inicializa la pu00e1gina basada en los paru00e1metros de URL
  */
 export async function initializePage(): Promise<void> {
@@ -40,6 +76,9 @@ export async function initializePage(): Promise<void> {
                 if (customWindow.yamlEditor) {
                     customWindow.yamlEditor.setValue(data.yaml_content);
                 }
+                
+                // Ensure metadata tab is active
+                activateTab('metadata');
             }
             
         } catch (error) {
@@ -65,6 +104,9 @@ export async function initializePage(): Promise<void> {
                 customWindow.yamlEditor.setValue(importedYaml);
             }
             
+            // Ensure metadata tab is active
+            activateTab('metadata');
+            
             // Clear sessionStorage after use
             sessionStorage.removeItem('temp_yaml_content');
             sessionStorage.removeItem('temp_yaml_name');
@@ -75,6 +117,9 @@ export async function initializePage(): Promise<void> {
     } else {
         // New assistant - load default template
         await loadDefaultTemplate();
+        
+        // Ensure metadata tab is active
+        activateTab('metadata');
     }
 }
 
@@ -90,5 +135,8 @@ export async function loadDefaultTemplate(): Promise<void> {
         if (customWindow.yamlEditor) {
             customWindow.yamlEditor.setValue(template);
         }
+        
+        // Ensure metadata tab is active
+        activateTab('metadata');
     }
 }

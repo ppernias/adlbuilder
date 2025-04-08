@@ -1,0 +1,30 @@
+/* Estilos para las pestañas */
+.tab {
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.tab.active {
+    font-weight: 600;
+    color: #0d9488; /* teal-600 */
+    border-bottom-color: #0d9488;
+}
+
+.tab:hover:not(.active) {
+    color: #4b5563; /* gray-600 */
+    border-bottom-color: #d1d5db; /* gray-300 */
+}
+
+/* Animación suave para cambio de pestañas */
+.tab-content {
+    transition: opacity 0.3s ease;
+}
+
+.tab-content.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.tab-content:not(.hidden) {
+    opacity: 1;
+}

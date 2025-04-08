@@ -51,4 +51,19 @@ def health_check():
 
 if __name__ == "__main__":
     import uvicorn
+    import logging
+    
+    # Configurar logging para mostrar mensajes de depuración
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler()  # Enviar logs a la consola
+        ]
+    )
+    # Configurar niveles de logging para bibliotecas externas
+    logging.getLogger('uvicorn').setLevel(logging.INFO)
+    logging.getLogger('sqlalchemy').setLevel(logging.WARNING)
+    
+    # Iniciar el servidor
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

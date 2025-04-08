@@ -105,8 +105,42 @@ def validate_yaml(
 ) -> Any:
     """Validate YAML content against schema"""
     try:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.setLevel(logging.DEBUG)
+        
+        logger.debug("Validating YAML content...")
+        logger.debug(f"Content length: {len(yaml_content)}")
+        
+        # Log primeras líneas del contenido para depuración
+        content_preview = '\n'.join(yaml_content.split('\n')[:10])  # Primeras 10 líneas
+        logger.debug(f"Content preview:\n{content_preview}...")
+        
+        # Validar que el contenido sea YAML válido antes de validar contra el esquema
+        try:
+            import yaml
+            parsed_yaml = yaml.safe_load(yaml_content)
+            if not parsed_yaml:
+                logger.error("Content is not valid YAML or is empty")
+                return {
+                    "valid": False,
+                    "errors": ["The content does not contain valid YAML or is empty."]
+                }
+            logger.debug("Content is valid YAML")
+            
+            # Imprimir la estructura del YAML para depuración
+            import json
+            logger.debug(f"YAML structure: {json.dumps(parsed_yaml, indent=2)}")
+        except Exception as yaml_error:
+            logger.error(f"Error parsing YAML: {yaml_error}")
+            return {
+                "valid": False,
+                "errors": [f"Error parsing YAML: {str(yaml_error)}"]
+            }
+        
         schema_path = Path("/root/adlbuilder/schema.yaml")
         if not schema_path.exists():
+            logger.error(f"Schema file not found: {schema_path}")
             raise HTTPException(
                 status_code=404,
                 detail="Schema file not found",
@@ -115,10 +149,17 @@ def validate_yaml(
         with open(schema_path, "r") as f:
             schema_content = f.read()
         
+        logger.debug("Schema file loaded successfully")
+        
         # Validate content
+        logger.debug("Validating against schema...")
         is_valid, errors = YAMLService.validate_yaml_against_schema(
             yaml_content, schema_content
         )
+        
+        logger.debug(f"Validation result: {is_valid}")
+        if errors:
+            logger.debug(f"Validation errors: {errors}")
         
         return {"valid": is_valid, "errors": errors}
     except Exception as e:
@@ -135,12 +176,23 @@ def upload_yaml_file(
 ) -> Any:
     """Upload and validate YAML file"""
     try:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.setLevel(logging.DEBUG)
+        
         # Read file content
         content = file.file.read().decode("utf-8")
+        logger.debug(f"Received file: {file.filename}")
+        logger.debug(f"Content length: {len(content)}")
+        
+        # Log primeras líneas del contenido para depuración
+        content_preview = '\n'.join(content.split('\n')[:10])  # Primeras 10 líneas
+        logger.debug(f"Content preview:\n{content_preview}...")
         
         # Read schema file
         schema_path = Path("/root/adlbuilder/schema.yaml")
         if not schema_path.exists():
+            logger.error(f"Schema file not found: {schema_path}")
             raise HTTPException(
                 status_code=404,
                 detail="Schema file not found",
@@ -149,10 +201,37 @@ def upload_yaml_file(
         with open(schema_path, "r") as f:
             schema_content = f.read()
         
-        # Validate content
+        logger.debug("Schema file loaded successfully")
+        
+        # Validar que el contenido sea YAML válido antes de validar contra el esquema
+        try:
+            import yaml
+            parsed_yaml = yaml.safe_load(content)
+            if not parsed_yaml:
+                logger.error("Content is not valid YAML or is empty")
+                return {
+                    "valid": False,
+                    "errors": ["The uploaded file does not contain valid YAML content or is empty."],
+                    "yaml_content": None
+                }
+            logger.debug("Content is valid YAML")
+        except Exception as yaml_error:
+            logger.error(f"Error parsing YAML: {yaml_error}")
+            return {
+                "valid": False,
+                "errors": [f"Error parsing YAML: {str(yaml_error)}"],
+                "yaml_content": None
+            }
+        
+        # Validate content against schema
+        logger.debug("Validating against schema...")
         is_valid, errors = YAMLService.validate_yaml_against_schema(
             content, schema_content
         )
+        
+        logger.debug(f"Validation result: {is_valid}")
+        if errors:
+            logger.debug(f"Validation errors: {errors}")
         
         if not is_valid:
             return {

@@ -173,7 +173,7 @@ properties:
         required:
           - tone
           - level_of_detail
-          - formating_rules
+          - formatting_rules
         properties:
           tone:
             type: string

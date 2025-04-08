@@ -17,6 +17,16 @@ export interface AssistantData {
     commands?: Command[];
     options?: Option[];
     decorators?: Decorator[];
+    metadata?: {
+        name: string;
+        description?: string;
+        version?: string;
+        model?: string;
+    };
+    assistant_instructions?: {
+        prompt?: string;
+        system_prompt?: string;
+    };
 }
 export interface Command {
     name: string;

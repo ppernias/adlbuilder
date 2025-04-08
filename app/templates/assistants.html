@@ -148,17 +148,47 @@
                     // Redirect to editor page
                     window.location.href = '/assistants/new?mode=import';
                 } else {
-                    // Show validation errors
-                    let errorMsg = 'El archivo YAML no es válido.';
+                    // Show validation errors with improved formatting in English
+                    let errorMsg = '<strong>YAML Validation Error:</strong>';
                     if (data.errors && data.errors.length > 0) {
-                        errorMsg += '<ul class="mt-2 list-disc list-inside">';
+                        errorMsg += '<ul class="mt-2 list-disc list-inside text-sm">';
                         data.errors.forEach(error => {
-                            errorMsg += `<li>${error}</li>`;
+                            // Improve presentation of common errors
+                            let formattedError = error;
+                            
+                            if (error.includes('Required field')) {
+                                formattedError = `<strong>Required Field:</strong> ${error}`;
+                            } else if (error.includes('additional properties')) {
+                                formattedError = `<strong>Not Allowed Property:</strong> ${error}. Check if there are properties not defined in the schema.`;
+                            } else if (error.includes('type')) {
+                                formattedError = `<strong>Incorrect Type:</strong> ${error}. Verify that the data type is as expected.`;
+                            } else if (error.includes('Syntax error')) {
+                                formattedError = `<strong>Syntax Error:</strong> ${error}`;
+                            }
+                            
+                            errorMsg += `<li class="mb-1">${formattedError}</li>`;
                         });
                         errorMsg += '</ul>';
+                    } else {
+                        errorMsg += `<p class="mt-2">The YAML file does not comply with the required schema. The YAML must have this structure:</p>
+                        <pre class="mt-2 text-xs bg-gray-100 p-2 rounded">
+metadata:
+  author:
+    name: Your Name
+  description:
+    title: Assistant Title
+    summary: Brief description
+    coverage: Topics covered
+    educational_level: [level]
+    use_cases: [use case]
+  visibility: public/private
+  rights: license info
+  history: []
+assistant_instructions: Your instructions here
+</pre>`;
                     }
                     
-                    showNotification(errorMsg, 'error', 10000); // Show for 10 seconds
+                    showNotification(errorMsg, 'error', 15000); // Show for 15 seconds for better readability
                 }
             } catch (error) {
                 console.error('Error uploading file:', error);

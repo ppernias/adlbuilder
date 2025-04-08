@@ -13,6 +13,17 @@ from app.services import yaml_service
 router = APIRouter(prefix="/assistants")
 
 
+@router.get("/template", response_model=schemas.YAMLContent)
+def get_assistant_template(
+    current_user: models.User = Depends(deps.get_current_user),
+) -> Any:
+    """
+    Get a default assistant template.
+    """
+    template = yaml_service.get_default_template()
+    return template
+
+
 @router.get("/", response_model=List[schemas.Assistant])
 def read_assistants(
     db=Depends(get_db),
@@ -227,12 +238,3 @@ def download_assistant(
     )
 
 
-@router.get("/template", response_model=schemas.YAMLContent)
-def get_assistant_template(
-    current_user: models.User = Depends(deps.get_current_user),
-) -> Any:
-    """
-    Get a default assistant template.
-    """
-    template = yaml_service.get_default_template()
-    return template

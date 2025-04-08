@@ -15,6 +15,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _notifications__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./notifications */ "./app/static/ts/modules/notifications.ts");
 /* harmony import */ var _yaml_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./yaml-utils */ "./app/static/ts/modules/yaml-utils.ts");
 /* harmony import */ var _form_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./form-utils */ "./app/static/ts/modules/form-utils.ts");
+/* harmony import */ var _page__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./page */ "./app/static/ts/modules/page.ts");
 // editor.ts - Funcionalidad especu00edfica del editor YAML
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -52,6 +53,7 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+
 
 
 
@@ -110,8 +112,8 @@ function initializeEditor() {
             }); }, 800);
         });
         // Set up tab switching
-        var tabs_1 = document.querySelectorAll('.tab');
-        tabs_1.forEach(function (tab) {
+        var tabs = document.querySelectorAll('.tab');
+        tabs.forEach(function (tab) {
             tab.addEventListener('click', function (e) {
                 var _a;
                 e.preventDefault();
@@ -120,18 +122,8 @@ function initializeEditor() {
                 // Don't do anything if clicking the already active tab
                 if (targetTab === currentActiveTab)
                     return;
-                // Deactivate all tabs
-                tabs_1.forEach(function (t) { return t.classList.remove('active'); });
-                // Hide all tab contents
-                var tabContents = document.querySelectorAll('.tab-content');
-                tabContents.forEach(function (content) { return content.classList.add('hidden'); });
-                // Activate clicked tab
-                tab.classList.add('active');
-                // Show corresponding tab content
-                var targetContent = document.getElementById("".concat(targetTab, "-content"));
-                if (targetContent) {
-                    targetContent.classList.remove('hidden');
-                }
+                // Activar la pestaña seleccionada usando la función centralizada
+                (0,_page__WEBPACK_IMPORTED_MODULE_3__.activateTab)(targetTab || 'metadata');
                 // If switching to YAML tab, update the editor content from form
                 if (targetTab === 'yaml' && currentActiveTab === 'form') {
                     try {
@@ -214,6 +206,164 @@ function initializeEditor() {
 
 /***/ }),
 
+/***/ "./app/static/ts/modules/file-loader.ts":
+/*!**********************************************!*\
+  !*** ./app/static/ts/modules/file-loader.ts ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   initializeFileLoader: () => (/* binding */ initializeFileLoader)
+/* harmony export */ });
+/* harmony import */ var _notifications__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./notifications */ "./app/static/ts/modules/notifications.ts");
+/* harmony import */ var _yaml_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./yaml-utils */ "./app/static/ts/modules/yaml-utils.ts");
+/* harmony import */ var _form_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./form-utils */ "./app/static/ts/modules/form-utils.ts");
+// file-loader.ts - Funciones para cargar archivos YAML
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+
+
+
+// Crear una referencia tipada al objeto window
+var customWindow = window;
+/**
+ * Inicializa el componente de carga de archivos YAML
+ */
+function initializeFileLoader() {
+    var fileInput = document.getElementById('yaml-file-input');
+    var loadFileBtn = document.getElementById('load-yaml-file-btn');
+    if (!fileInput || !loadFileBtn) {
+        console.error('No se encontraron los elementos necesarios para la carga de archivos YAML');
+        return;
+    }
+    // Asignar el evento al botón
+    loadFileBtn.addEventListener('click', function () {
+        fileInput.click();
+    });
+    // Asignar el evento al input
+    fileInput.addEventListener('change', handleFileSelect);
+    console.log('Inicializado el cargador de archivos YAML');
+}
+/**
+ * Maneja la selección de un archivo YAML
+ * @param event Evento de cambio del input file
+ */
+function handleFileSelect(event) {
+    return __awaiter(this, void 0, void 0, function () {
+        var fileInput, files, file, yamlContent, isValid, yamlEditor, inputEvent, yamlTab, error_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    fileInput = event.target;
+                    files = fileInput.files;
+                    if (!files || files.length === 0) {
+                        return [2 /*return*/];
+                    }
+                    file = files[0];
+                    // Verificar que sea un archivo YAML
+                    if (!file.name.endsWith('.yaml') && !file.name.endsWith('.yml')) {
+                        (0,_notifications__WEBPACK_IMPORTED_MODULE_0__.showNotification)('Por favor, selecciona un archivo YAML válido (.yaml o .yml)', 'error');
+                        return [2 /*return*/];
+                    }
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 4, , 5]);
+                    return [4 /*yield*/, readFileAsText(file)];
+                case 2:
+                    yamlContent = _a.sent();
+                    return [4 /*yield*/, (0,_yaml_utils__WEBPACK_IMPORTED_MODULE_1__.validateYamlContent)(yamlContent, false)];
+                case 3:
+                    isValid = _a.sent();
+                    if (isValid) {
+                        yamlEditor = document.getElementById('yaml-editor');
+                        if (yamlEditor) {
+                            yamlEditor.value = yamlContent;
+                            inputEvent = new Event('input', { bubbles: true });
+                            yamlEditor.dispatchEvent(inputEvent);
+                        }
+                        // Poblar el formulario con los datos del YAML
+                        (0,_form_utils__WEBPACK_IMPORTED_MODULE_2__.populateFormFromYaml)(yamlContent);
+                        yamlTab = document.querySelector('a[data-tab="yaml"]');
+                        if (yamlTab) {
+                            yamlTab.click();
+                        }
+                        (0,_notifications__WEBPACK_IMPORTED_MODULE_0__.showNotification)("Archivo '".concat(file.name, "' cargado correctamente"), 'success');
+                    }
+                    return [3 /*break*/, 5];
+                case 4:
+                    error_1 = _a.sent();
+                    (0,_notifications__WEBPACK_IMPORTED_MODULE_0__.showNotification)("Error al leer el archivo: ".concat(error_1.message), 'error');
+                    return [3 /*break*/, 5];
+                case 5:
+                    // Limpiar el input para permitir cargar el mismo archivo nuevamente
+                    fileInput.value = '';
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+/**
+ * Lee un archivo como texto
+ * @param file Archivo a leer
+ * @returns Promesa con el contenido del archivo
+ */
+function readFileAsText(file) {
+    return new Promise(function (resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function (event) {
+            var _a;
+            if ((_a = event.target) === null || _a === void 0 ? void 0 : _a.result) {
+                resolve(event.target.result);
+            }
+            else {
+                reject(new Error('No se pudo leer el archivo'));
+            }
+        };
+        reader.onerror = function () {
+            reject(new Error('Error al leer el archivo'));
+        };
+        reader.readAsText(file);
+    });
+}
+
+
+/***/ }),
+
 /***/ "./app/static/ts/modules/form-utils.ts":
 /*!*********************************************!*\
   !*** ./app/static/ts/modules/form-utils.ts ***!
@@ -228,6 +378,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _notifications__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./notifications */ "./app/static/ts/modules/notifications.ts");
 /* harmony import */ var _yaml_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./yaml-utils */ "./app/static/ts/modules/yaml-utils.ts");
+/* harmony import */ var _page__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./page */ "./app/static/ts/modules/page.ts");
 // form-utils.ts - Funciones para manejar formularios
 var __assign = (undefined && undefined.__assign) || function () {
     __assign = Object.assign || function(t) {
@@ -276,6 +427,7 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+
 
 
 // Crear una referencia tipada al objeto window
@@ -424,7 +576,11 @@ function populateFormFromYaml(yamlContent) {
         if (!data) {
             throw new Error('YAML invu00e1lido o vaciu00f3');
         }
-        // Rellenar campos bu00e1sicos
+        console.log('Populating form with YAML data:', data);
+        // Extraer datos de metadata y assistant_instructions si existen
+        var metadata = data.metadata || data;
+        var instructions = data.assistant_instructions || data;
+        // Rellenar campos bu00e1sicos desde metadata o del objeto principal
         var nameInput = document.querySelector('[name="name"]');
         var descInput = document.querySelector('[name="description"]');
         var versionInput = document.querySelector('[name="version"]');
@@ -432,17 +588,19 @@ function populateFormFromYaml(yamlContent) {
         var promptInput = document.querySelector('[name="prompt"]');
         var systemPromptInput = document.querySelector('[name="system_prompt"]');
         if (nameInput)
-            nameInput.value = data.name || '';
+            nameInput.value = metadata.name || data.name || '';
         if (descInput)
-            descInput.value = data.description || '';
+            descInput.value = metadata.description || data.description || '';
         if (versionInput)
-            versionInput.value = data.version || '';
+            versionInput.value = metadata.version || data.version || '';
         if (modelInput)
-            modelInput.value = data.model || '';
+            modelInput.value = metadata.model || data.model || '';
         if (promptInput)
-            promptInput.value = data.prompt || '';
+            promptInput.value = instructions.prompt || data.prompt || '';
         if (systemPromptInput)
-            systemPromptInput.value = data.system_prompt || '';
+            systemPromptInput.value = instructions.system_prompt || data.system_prompt || '';
+        // Activar la pestaña de Metadata
+        (0,_page__WEBPACK_IMPORTED_MODULE_2__.activateTab)('metadata');
         // Limpiar contenedores existentes
         var commandsContainer_1 = document.getElementById('commands-container');
         var optionsContainer_1 = document.getElementById('options-container');
@@ -581,6 +739,7 @@ function handleFormSubmit(event) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   activateTab: () => (/* reexport safe */ _page__WEBPACK_IMPORTED_MODULE_6__.activateTab),
 /* harmony export */   addCommandItem: () => (/* reexport safe */ _ui_components__WEBPACK_IMPORTED_MODULE_4__.addCommandItem),
 /* harmony export */   addDecoratorItem: () => (/* reexport safe */ _ui_components__WEBPACK_IMPORTED_MODULE_4__.addDecoratorItem),
 /* harmony export */   addOptionItem: () => (/* reexport safe */ _ui_components__WEBPACK_IMPORTED_MODULE_4__.addOptionItem),
@@ -589,6 +748,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   handleFormSubmit: () => (/* reexport safe */ _form_utils__WEBPACK_IMPORTED_MODULE_3__.handleFormSubmit),
 /* harmony export */   initAccordions: () => (/* reexport safe */ _ui_components__WEBPACK_IMPORTED_MODULE_4__.initAccordions),
 /* harmony export */   initializeEditor: () => (/* reexport safe */ _editor__WEBPACK_IMPORTED_MODULE_5__.initializeEditor),
+/* harmony export */   initializeFileLoader: () => (/* reexport safe */ _file_loader__WEBPACK_IMPORTED_MODULE_7__.initializeFileLoader),
 /* harmony export */   initializePage: () => (/* reexport safe */ _page__WEBPACK_IMPORTED_MODULE_6__.initializePage),
 /* harmony export */   loadDefaultTemplate: () => (/* reexport safe */ _page__WEBPACK_IMPORTED_MODULE_6__.loadDefaultTemplate),
 /* harmony export */   loadTemplate: () => (/* reexport safe */ _yaml_utils__WEBPACK_IMPORTED_MODULE_2__.loadTemplate),
@@ -605,11 +765,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ui_components__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ui-components */ "./app/static/ts/modules/ui-components.ts");
 /* harmony import */ var _editor__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./editor */ "./app/static/ts/modules/editor.ts");
 /* harmony import */ var _page__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./page */ "./app/static/ts/modules/page.ts");
-/* harmony import */ var _main__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./main */ "./app/static/ts/modules/main.ts");
+/* harmony import */ var _file_loader__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./file-loader */ "./app/static/ts/modules/file-loader.ts");
+/* harmony import */ var _main__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./main */ "./app/static/ts/modules/main.ts");
 // index.ts - Archivo de barril para exportar todos los mu00f3dulos
 // Exportar tipos
 
 // Exportar utilidades
+
 
 
 
@@ -837,6 +999,7 @@ function showNotification(message, type, duration, id) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   activateTab: () => (/* binding */ activateTab),
 /* harmony export */   initializePage: () => (/* binding */ initializePage),
 /* harmony export */   loadDefaultTemplate: () => (/* binding */ loadDefaultTemplate)
 /* harmony export */ });
@@ -886,6 +1049,38 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
 // Crear una referencia tipada al objeto window
 var customWindow = window;
 /**
+ * Activa una pestaña específica
+ * @param tabId ID de la pestaña a activar (sin el sufijo '-tab')
+ */
+function activateTab(tabId) {
+    // Deactivate all tabs
+    var tabs = document.querySelectorAll('.tab');
+    tabs.forEach(function (tab) {
+        tab.classList.remove('active');
+        // Eliminar estilos específicos de pestaña activa
+        tab.classList.remove('text-teal-600');
+        tab.classList.remove('border-teal-600');
+        tab.classList.add('border-transparent');
+    });
+    // Hide all tab contents
+    var tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(function (content) { return content.classList.add('hidden'); });
+    // Activate target tab
+    var targetTab = document.querySelector("[data-tab=\"".concat(tabId, "\"]"));
+    if (targetTab) {
+        targetTab.classList.add('active');
+        // Aplicar estilos específicos de pestaña activa
+        targetTab.classList.add('text-teal-600');
+        targetTab.classList.add('border-teal-600');
+        targetTab.classList.remove('border-transparent');
+    }
+    // Show corresponding tab content
+    var targetContent = document.getElementById("".concat(tabId, "-content"));
+    if (targetContent) {
+        targetContent.classList.remove('hidden');
+    }
+}
+/**
  * Inicializa la pu00e1gina basada en los paru00e1metros de URL
  */
 function initializePage() {
@@ -922,6 +1117,8 @@ function initializePage() {
                         if (customWindow.yamlEditor) {
                             customWindow.yamlEditor.setValue(data.yaml_content);
                         }
+                        // Ensure metadata tab is active
+                        activateTab('metadata');
                     }
                     return [3 /*break*/, 5];
                 case 4:
@@ -944,6 +1141,8 @@ function initializePage() {
                     if (customWindow.yamlEditor) {
                         customWindow.yamlEditor.setValue(importedYaml);
                     }
+                    // Ensure metadata tab is active
+                    activateTab('metadata');
                     // Clear sessionStorage after use
                     sessionStorage.removeItem('temp_yaml_content');
                     sessionStorage.removeItem('temp_yaml_name');
@@ -962,6 +1161,8 @@ function initializePage() {
                 case 11:
                     // New assistant - load default template
                     _c.sent();
+                    // Ensure metadata tab is active
+                    activateTab('metadata');
                     _c.label = 12;
                 case 12: return [2 /*return*/];
             }
@@ -985,6 +1186,8 @@ function loadDefaultTemplate() {
                         if (customWindow.yamlEditor) {
                             customWindow.yamlEditor.setValue(template);
                         }
+                        // Ensure metadata tab is active
+                        activateTab('metadata');
                     }
                     return [2 /*return*/];
             }
@@ -1198,14 +1401,13 @@ var customWindow = window;
  */
 function validateYaml(yamlContent_1) {
     return __awaiter(this, arguments, void 0, function (yamlContent, showNotifications) {
-        var response, errorText, data, errorMessage, error_1;
-        var _a;
+        var response, errorText, data, errorMessages, formattedErrors, error_1;
         if (showNotifications === void 0) { showNotifications = true; }
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0:
-                    _b.trys.push([0, 5, , 6]);
-                    return [4 /*yield*/, fetch('/api/v1/assistants/validate-yaml', {
+                    _a.trys.push([0, 5, , 6]);
+                    return [4 /*yield*/, fetch('/api/v1/assistants/validate', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -1214,27 +1416,44 @@ function validateYaml(yamlContent_1) {
                             body: JSON.stringify({ yaml_content: yamlContent }),
                         })];
                 case 1:
-                    response = _b.sent();
+                    response = _a.sent();
                     if (!!response.ok) return [3 /*break*/, 3];
                     return [4 /*yield*/, response.text()];
                 case 2:
-                    errorText = _b.sent();
+                    errorText = _a.sent();
                     throw new Error("Error de validaciu00f3n: ".concat(response.status, " ").concat(errorText));
                 case 3: return [4 /*yield*/, response.json()];
                 case 4:
-                    data = _b.sent();
+                    data = _a.sent();
                     if (showNotifications) {
                         if (data.valid) {
                             (0,_notifications__WEBPACK_IMPORTED_MODULE_0__.showNotification)('YAML validado correctamente', 'success');
                         }
                         else {
-                            errorMessage = ((_a = data.errors) === null || _a === void 0 ? void 0 : _a.join('\n')) || 'Error desconocido';
-                            (0,_notifications__WEBPACK_IMPORTED_MODULE_0__.showNotification)("Error de validaciu00f3n:\n".concat(errorMessage), 'error');
+                            errorMessages = data.errors || ['Unknown error'];
+                            formattedErrors = errorMessages.map(function (err) {
+                                // Detectar tipos comunes de errores y proporcionar explicaciones más claras
+                                if (err.includes('Required field')) {
+                                    var match = err.match(/\'([^']+)\'/);
+                                    var field = match ? match[1] : 'unknown';
+                                    return "Required field: '".concat(field, "' is missing in the YAML. This field is mandatory.");
+                                }
+                                else if (err.includes('must be')) {
+                                    return "Incorrect data type: ".concat(err, ". Verify that the value has the correct format.");
+                                }
+                                else if (err.includes('additional properties')) {
+                                    return "Not allowed property: ".concat(err, ". You have included a field that is not defined in the schema.");
+                                }
+                                else {
+                                    return "Error: ".concat(err);
+                                }
+                            }).join('\n');
+                            (0,_notifications__WEBPACK_IMPORTED_MODULE_0__.showNotification)("Errores de validaci\u00F3n YAML:\n".concat(formattedErrors), 'error');
                         }
                     }
                     return [2 /*return*/, data];
                 case 5:
-                    error_1 = _b.sent();
+                    error_1 = _a.sent();
                     if (showNotifications) {
                         (0,_notifications__WEBPACK_IMPORTED_MODULE_0__.showNotification)("Error: ".concat(error_1.message), 'error');
                     }
@@ -1287,58 +1506,144 @@ function loadTemplate() {
  */
 function validateYamlContent(yamlContent_1) {
     return __awaiter(this, arguments, void 0, function (yamlContent, silentMode) {
-        var parsedYaml, clientErrors, validationStatus, result, validationStatus, errorMessages, error_3, validationStatus;
-        var _a, _b;
+        var parsedYaml, clientErrors_1, validationStatusElements, formattedClientErrors, result_1, validationStatusElements, error_3, validationStatusElements, errorMsg, formattedError;
+        var _a;
         if (silentMode === void 0) { silentMode = false; }
-        return __generator(this, function (_c) {
-            switch (_c.label) {
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
-                    _c.trys.push([0, 2, , 3]);
+                    _b.trys.push([0, 2, , 3]);
                     parsedYaml = (_a = customWindow.jsyaml) === null || _a === void 0 ? void 0 : _a.load(yamlContent);
                     if (!parsedYaml) {
                         throw new Error('El YAML no puede estar vacio');
                     }
-                    clientErrors = [];
-                    if (!parsedYaml.name) {
-                        clientErrors.push('El campo \'name\' es obligatorio');
+                    clientErrors_1 = [];
+                    // Verificar que el YAML tenga las secciones principales requeridas por el esquema
+                    if (!parsedYaml.metadata) {
+                        clientErrors_1.push('La sección \'metadata\' es obligatoria');
+                    }
+                    if (!parsedYaml.assistant_instructions) {
+                        clientErrors_1.push('La sección \'assistant_instructions\' es obligatoria');
                     }
                     // Si hay errores del cliente, mostrar y retornar
-                    if (clientErrors.length > 0) {
+                    if (clientErrors_1.length > 0) {
                         if (!silentMode) {
-                            validationStatus = document.getElementById('validation-status');
-                            if (validationStatus) {
-                                validationStatus.innerHTML = "<div class=\"flex items-center\">\n                        <span class=\"inline-flex items-center justify-center p-1 bg-red-100 text-red-700 rounded-full mr-2\">\n                            <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" viewBox=\"0 0 20 20\" fill=\"currentColor\">\n                                <path fill-rule=\"evenodd\" d=\"M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z\" clip-rule=\"evenodd\" />\n                            </svg>\n                        </span>\n                        <span class=\"text-red-700 font-medium\">YAML invu00e1lido</span>\n                    </div>\n                    <div class=\"mt-2 text-sm text-red-600\">".concat(clientErrors.map(function (err) { return "<div class=\"mb-1\">".concat(err, "</div>"); }).join(''), "</div>");
-                            }
-                            (0,_notifications__WEBPACK_IMPORTED_MODULE_0__.showNotification)("YAML invu00e1lido: ".concat(clientErrors.join(', ')), 'error');
+                            validationStatusElements = document.querySelectorAll('#validation-status');
+                            validationStatusElements.forEach(function (validationStatus) {
+                                // Mejorar la presentación de errores con explicaciones
+                                var formattedErrors = clientErrors_1.map(function (err) {
+                                    // Proporcionar explicaciones más detalladas para cada tipo de error
+                                    if (err.includes("'metadata' es obligatoria")) {
+                                        return "<div class=\"mb-1\"><strong>Secci\u00F3n 'metadata' obligatoria:</strong> Debes incluir la secci\u00F3n 'metadata' en el YAML. Esta secci\u00F3n contiene informaci\u00F3n sobre el autor, descripci\u00F3n y otros metadatos del asistente.</div>";
+                                    }
+                                    else if (err.includes("'assistant_instructions' es obligatoria")) {
+                                        return "<div class=\"mb-1\"><strong>Secci\u00F3n 'assistant_instructions' obligatoria:</strong> Debes incluir la secci\u00F3n 'assistant_instructions' en el YAML. Esta secci\u00F3n contiene las instrucciones y comportamiento del asistente.</div>";
+                                    }
+                                    else if (err.includes("El YAML no puede estar vacio")) {
+                                        return "<div class=\"mb-1\"><strong>Documento vac\u00EDo:</strong> El documento YAML no puede estar vac\u00EDo. Debes proporcionar al menos la estructura b\u00E1sica del asistente con las secciones 'metadata' y 'assistant_instructions'.</div>";
+                                    }
+                                    else {
+                                        return "<div class=\"mb-1\"><strong>Error de validaci\u00F3n:</strong> ".concat(err, "</div>");
+                                    }
+                                }).join('');
+                                validationStatus.innerHTML = "<div class=\"flex items-center\">\n                        <span class=\"inline-flex items-center justify-center p-1 bg-red-100 text-red-700 rounded-full mr-2\">\n                            <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" viewBox=\"0 0 20 20\" fill=\"currentColor\">\n                                <path fill-rule=\"evenodd\" d=\"M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z\" clip-rule=\"evenodd\" />\n                            </svg>\n                        </span>\n                        <span class=\"text-red-700 font-medium\">YAML inv\u00E1lido</span>\n                    </div>\n                    <div class=\"mt-2 text-sm text-red-600 validation-error-details\">".concat(formattedErrors, "</div>");
+                            });
+                            formattedClientErrors = clientErrors_1.map(function (err) {
+                                if (err.includes("'metadata' es obligatoria")) {
+                                    return "Secci\u00F3n 'metadata' obligatoria: Debes incluir la secci\u00F3n de metadatos";
+                                }
+                                else if (err.includes("'assistant_instructions' es obligatoria")) {
+                                    return "Secci\u00F3n 'assistant_instructions' obligatoria: Debes incluir las instrucciones del asistente";
+                                }
+                                else {
+                                    return err;
+                                }
+                            }).join(', ');
+                            (0,_notifications__WEBPACK_IMPORTED_MODULE_0__.showNotification)("YAML inv\u00E1lido: ".concat(formattedClientErrors), 'error');
                         }
                         return [2 /*return*/, false];
                     }
                     return [4 /*yield*/, validateYaml(yamlContent, !silentMode)];
                 case 1:
-                    result = _c.sent();
+                    result_1 = _b.sent();
                     // Actualizar UI si no estamos en modo silencioso
                     if (!silentMode) {
-                        validationStatus = document.getElementById('validation-status');
-                        if (validationStatus) {
-                            if (result.valid) {
+                        validationStatusElements = document.querySelectorAll('#validation-status');
+                        validationStatusElements.forEach(function (validationStatus) {
+                            if (result_1.valid) {
                                 validationStatus.innerHTML = "<div class=\"flex items-center\">\n                        <span class=\"inline-flex items-center justify-center p-1 bg-green-100 text-green-700 rounded-full mr-2\">\n                            <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" viewBox=\"0 0 20 20\" fill=\"currentColor\">\n                                <path fill-rule=\"evenodd\" d=\"M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z\" clip-rule=\"evenodd\" />\n                            </svg>\n                        </span>\n                        <span class=\"text-green-700 font-medium\">Sintaxis YAML vu00e1lida</span>\n                    </div>";
                             }
                             else {
-                                errorMessages = ((_b = result.errors) === null || _b === void 0 ? void 0 : _b.join('<br>')) || 'Error desconocido';
-                                validationStatus.innerHTML = "<div class=\"flex items-center\">\n                        <span class=\"inline-flex items-center justify-center p-1 bg-red-100 text-red-700 rounded-full mr-2\">\n                            <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" viewBox=\"0 0 20 20\" fill=\"currentColor\">\n                                <path fill-rule=\"evenodd\" d=\"M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z\" clip-rule=\"evenodd\" />\n                            </svg>\n                        </span>\n                        <span class=\"text-red-700 font-medium\">Error de validaciu00f3n</span>\n                    </div>\n                    <div class=\"mt-2 text-sm text-red-600\">".concat(errorMessages, "</div>");
+                                // Mejorar la presentación de errores del servidor con explicaciones más detalladas
+                                var errorList = result_1.errors || ['Error desconocido'];
+                                var formattedErrors = errorList.map(function (err) {
+                                    // Detectar tipos comunes de errores y proporcionar explicaciones más claras
+                                    if (err.includes('required property')) {
+                                        var match = err.match(/\'([^']+)\'/);
+                                        var field = match ? match[1] : 'desconocido';
+                                        return "<div class=\"mb-1\"><strong>Campo requerido:</strong> '".concat(field, "' no est\u00E1 presente en el YAML. Este campo es obligatorio para que el asistente funcione correctamente.</div>");
+                                    }
+                                    else if (err.includes('must be')) {
+                                        return "<div class=\"mb-1\"><strong>Tipo de dato incorrecto:</strong> ".concat(err, ". Verifica que el valor tenga el formato correcto seg\u00FAn la documentaci\u00F3n.</div>");
+                                    }
+                                    else if (err.includes('additional properties')) {
+                                        return "<div class=\"mb-1\"><strong>Propiedad no permitida:</strong> ".concat(err, ". Has incluido un campo que no est\u00E1 definido en el esquema del asistente.</div>");
+                                    }
+                                    else if (err.includes('schema')) {
+                                        return "<div class=\"mb-1\"><strong>Error de esquema:</strong> ".concat(err, ". La estructura del YAML no cumple con el esquema requerido.</div>");
+                                    }
+                                    else {
+                                        return "<div class=\"mb-1\"><strong>Error:</strong> ".concat(err, "</div>");
+                                    }
+                                }).join('');
+                                validationStatus.innerHTML = "<div class=\"flex items-center\">\n                        <span class=\"inline-flex items-center justify-center p-1 bg-red-100 text-red-700 rounded-full mr-2\">\n                            <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" viewBox=\"0 0 20 20\" fill=\"currentColor\">\n                                <path fill-rule=\"evenodd\" d=\"M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z\" clip-rule=\"evenodd\" />\n                            </svg>\n                        </span>\n                        <span class=\"text-red-700 font-medium\">Error de validaci\u00F3n</span>\n                    </div>\n                    <div class=\"mt-2 text-sm text-red-600 validation-error-details\">".concat(formattedErrors, "</div>");
                             }
-                        }
+                        });
                     }
-                    return [2 /*return*/, result.valid];
+                    return [2 /*return*/, result_1.valid];
                 case 2:
-                    error_3 = _c.sent();
+                    error_3 = _b.sent();
                     // Error de sintaxis
                     if (!silentMode) {
-                        validationStatus = document.getElementById('validation-status');
-                        if (validationStatus) {
-                            validationStatus.innerHTML = "<div class=\"flex items-center\">\n                    <span class=\"inline-flex items-center justify-center p-1 bg-red-100 text-red-700 rounded-full mr-2\">\n                        <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" viewBox=\"0 0 20 20\" fill=\"currentColor\">\n                            <path fill-rule=\"evenodd\" d=\"M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z\" clip-rule=\"evenodd\" />\n                        </svg>\n                    </span>\n                    <span class=\"text-red-700 font-medium\">Error de sintaxis</span>\n                </div>\n                <div class=\"mt-2 text-sm text-red-600\">".concat(error_3.message, "</div>");
+                        validationStatusElements = document.querySelectorAll('#validation-status');
+                        validationStatusElements.forEach(function (validationStatus) {
+                            // Mejorar la presentación de errores de sintaxis con explicaciones más detalladas
+                            var errorMsg = error_3.message;
+                            var formattedError = errorMsg;
+                            // Detect common syntax error types and provide clearer explanations
+                            if (errorMsg.includes('duplicated mapping key')) {
+                                formattedError = "<strong>Duplicated key:</strong> ".concat(errorMsg, ". You have defined the same property more than once at the same level.");
+                            }
+                            else if (errorMsg.includes('end of the stream') || errorMsg.includes('unexpected end')) {
+                                formattedError = "<strong>Structure error:</strong> ".concat(errorMsg, ". Verify that all braces, brackets, and quotes are properly closed.");
+                            }
+                            else if (errorMsg.includes('expected a mapping')) {
+                                formattedError = "<strong>Format error:</strong> ".concat(errorMsg, ". An object (mapping) was expected but another data type was found.");
+                            }
+                            else if (errorMsg.includes('cannot read')) {
+                                formattedError = "<strong>Reading error:</strong> ".concat(errorMsg, ". The YAML document cannot be correctly interpreted.");
+                            }
+                            else if (errorMsg.includes('YAML content cannot be empty')) {
+                                formattedError = "<strong>Empty document:</strong> The YAML cannot be empty. You must provide at least the basic structure of the assistant with required fields: name, model, prompt.";
+                            }
+                            else {
+                                formattedError = "<strong>Syntax error:</strong> ".concat(errorMsg, ". Check the structure and format of your YAML document.");
+                            }
+                            validationStatus.innerHTML = "<div class=\"flex items-center\">\n                    <span class=\"inline-flex items-center justify-center p-1 bg-red-100 text-red-700 rounded-full mr-2\">\n                        <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" viewBox=\"0 0 20 20\" fill=\"currentColor\">\n                            <path fill-rule=\"evenodd\" d=\"M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z\" clip-rule=\"evenodd\" />\n                        </svg>\n                    </span>\n                    <span class=\"text-red-700 font-medium\">Syntax Error</span>\n                </div>\n                <div class=\"mt-2 text-sm text-red-600 validation-error-details\">".concat(formattedError, "</div>\n                <div class=\"mt-1 text-xs text-gray-600\">Required sections: metadata, assistant_instructions</div>");
+                        });
+                        errorMsg = error_3.message;
+                        formattedError = "YAML syntax error: ".concat(errorMsg);
+                        // Provide more informative messages based on error type
+                        if (errorMsg.includes('duplicated mapping key')) {
+                            formattedError = "Syntax error: You have defined a duplicate property in the YAML. Check for repeated keys.";
                         }
-                        (0,_notifications__WEBPACK_IMPORTED_MODULE_0__.showNotification)("Error de sintaxis YAML: ".concat(error_3.message), 'error');
+                        else if (errorMsg.includes('end of the stream') || errorMsg.includes('unexpected end')) {
+                            formattedError = "Syntax error: The YAML structure is incomplete. Verify that all braces and brackets are properly closed.";
+                        }
+                        else if (errorMsg.includes('YAML content cannot be empty')) {
+                            formattedError = "Error: The YAML document cannot be empty. You must provide at least the basic structure of the assistant with required fields: name, model, prompt.";
+                        }
+                        (0,_notifications__WEBPACK_IMPORTED_MODULE_0__.showNotification)(formattedError, 'error', 10000); // Show for 10 seconds for better readability
                     }
                     return [2 /*return*/, false];
                 case 3: return [2 /*return*/];
@@ -1364,11 +1669,11 @@ function copyYamlToClipboard() {
                     // Copy to clipboard
                     _b.sent();
                     // Show success notification
-                    (0,_notifications__WEBPACK_IMPORTED_MODULE_0__.showNotification)('YAML copiado al portapapeles', 'success');
+                    (0,_notifications__WEBPACK_IMPORTED_MODULE_0__.showNotification)('YAML copied to clipboard', 'success');
                     return [3 /*break*/, 3];
                 case 2:
                     error_4 = _b.sent();
-                    (0,_notifications__WEBPACK_IMPORTED_MODULE_0__.showNotification)("Error al copiar: ".concat(error_4.message), 'error');
+                    (0,_notifications__WEBPACK_IMPORTED_MODULE_0__.showNotification)("Error copying: ".concat(error_4.message), 'error');
                     return [3 /*break*/, 3];
                 case 3: return [2 /*return*/];
             }
@@ -1446,11 +1751,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_editor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./modules/editor */ "./app/static/ts/modules/editor.ts");
 /* harmony import */ var _modules_ui_components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/ui-components */ "./app/static/ts/modules/ui-components.ts");
 /* harmony import */ var _modules_page__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/page */ "./app/static/ts/modules/page.ts");
+/* harmony import */ var _modules_file_loader__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./modules/file-loader */ "./app/static/ts/modules/file-loader.ts");
 // assistant_editor.ts - Punto de entrada principal para el editor de asistentes
 // Este archivo importa todos los módulos necesarios
 // Importar todos los módulos desde el archivo de barril
 
 // Importar funciones específicas que necesitamos
+
 
 
 
@@ -1463,6 +1770,7 @@ document.addEventListener('DOMContentLoaded', function () {
     (0,_modules_editor__WEBPACK_IMPORTED_MODULE_1__.initializeEditor)();
     (0,_modules_ui_components__WEBPACK_IMPORTED_MODULE_2__.initAccordions)();
     (0,_modules_page__WEBPACK_IMPORTED_MODULE_3__.initializePage)();
+    (0,_modules_file_loader__WEBPACK_IMPORTED_MODULE_4__.initializeFileLoader)();
 });
 
 })();

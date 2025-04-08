@@ -4,6 +4,7 @@ import { CustomWindow } from './types';
 import { showNotification } from './notifications';
 import { validateYamlContent } from './yaml-utils';
 import { populateFormFromYaml, generateYamlFromForm } from './form-utils';
+import { activateTab } from './page';
 
 // Crear una referencia tipada al objeto window
 const customWindow = window as CustomWindow;
@@ -64,21 +65,8 @@ export function initializeEditor(): void {
                 // Don't do anything if clicking the already active tab
                 if (targetTab === currentActiveTab) return;
                 
-                // Deactivate all tabs
-                tabs.forEach(t => t.classList.remove('active'));
-                
-                // Hide all tab contents
-                const tabContents = document.querySelectorAll('.tab-content');
-                tabContents.forEach(content => content.classList.add('hidden'));
-                
-                // Activate clicked tab
-                tab.classList.add('active');
-                
-                // Show corresponding tab content
-                const targetContent = document.getElementById(`${targetTab}-content`);
-                if (targetContent) {
-                    targetContent.classList.remove('hidden');
-                }
+                // Activar la pestaña seleccionada usando la función centralizada
+                activateTab(targetTab || 'metadata');
                 
                 // If switching to YAML tab, update the editor content from form
                 if (targetTab === 'yaml' && currentActiveTab === 'form') {

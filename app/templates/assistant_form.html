@@ -18,30 +18,35 @@
             
             <!-- Tabs Navigation -->
             <div class="flex justify-between items-center mb-6">
-                <div class="border-b border-gray-200">
-                    <ul class="flex flex-wrap -mb-px">
-                        <li class="mr-2">
-                            <a href="#" class="tab active" data-tab="metadata">Metadata</a>
+                <div class="w-full border-b border-gray-200">
+                    <ul class="flex flex-wrap -mb-px text-center">
+                        <li class="mr-2 flex-grow">
+                            <a href="#" class="tab active inline-block p-4 text-teal-600 border-b-2 border-teal-600 rounded-t-lg hover:text-teal-800 hover:border-teal-800 w-full" data-tab="metadata">Metadata</a>
                         </li>
-                        <li class="mr-2">
-                            <a href="#" class="tab" data-tab="instructions">Assistant Instructions</a>
+                        <li class="mr-2 flex-grow">
+                            <a href="#" class="tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 w-full" data-tab="instructions">Assistant Instructions</a>
                         </li>
-                        <li class="mr-2">
-                            <a href="#" class="tab" data-tab="tools">Tools</a>
+                        <li class="mr-2 flex-grow">
+                            <a href="#" class="tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 w-full" data-tab="tools">Tools</a>
                         </li>
-                        <li>
-                            <a href="#" class="tab" data-tab="yaml">YAML</a>
+                        <li class="flex-grow">
+                            <a href="#" class="tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 w-full" data-tab="yaml">YAML</a>
                         </li>
                     </ul>
                 </div>
-                <button type="button" id="load-template-btn" class="bg-teal-500 text-white py-2 px-4 rounded-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition duration-300">
-                    Load Template
-                </button>
+                <div class="flex space-x-2">
+                    <button type="button" id="load-yaml-file-btn" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300">
+                        Load YAML File
+                    </button>
+                    <button type="button" id="load-template-btn" class="bg-teal-500 text-white py-2 px-4 rounded-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition duration-300">
+                        Load Template
+                    </button>
+                </div>
             </div>
             
             <!-- Tab Contents -->
             <!-- YAML Tab Content -->
-            <div class="tab-content" id="yaml-tab">
+            <div class="tab-content hidden" id="yaml-tab">
                 <div class="space-y-4">
                     <div class="border border-gray-300 rounded-md p-4">
                         <div class="mb-4">
@@ -215,6 +220,7 @@
             <input type="hidden" id="form-mode" value="{{ mode }}">
             <input type="hidden" id="assistant-id" value="{{ assistant.id if assistant else '' }}">
             <input type="hidden" id="yaml-content" name="yaml_content">
+            <input type="file" id="yaml-file-input" accept=".yaml,.yml" class="hidden">
             
             <!-- Form Actions -->
             <div class="flex justify-between items-center mt-8">
@@ -238,6 +244,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/yaml/yaml.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+<link rel="stylesheet" href="/static/css/tabs.css">
 
 <!-- Include js-yaml for YAML parsing -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>

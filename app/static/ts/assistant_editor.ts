@@ -8,6 +8,7 @@ import * as AssistantEditor from './modules/index';
 import { initializeEditor } from './modules/editor';
 import { initAccordions } from './modules/ui-components';
 import { initializePage } from './modules/page';
+import { initializeFileLoader } from './modules/file-loader';
 
 // Exponer funciones y tipos necesarios globalmente
 (window as any).AssistantEditor = AssistantEditor;
@@ -20,4 +21,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeEditor();
     initAccordions();
     initializePage();
+    initializeFileLoader();
 });

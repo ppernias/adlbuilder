@@ -5,4 +5,5 @@ export * from './form-utils';
 export * from './ui-components';
 export * from './editor';
 export * from './page';
+export * from './file-loader';
 export * from './main';
