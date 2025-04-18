@@ -186,30 +186,32 @@ async def create_new_yaml_file(
     # Convertir el YAML a un diccionario para modificarlo
     yaml_dict = yaml.safe_load(default_content)
     
-    # Asegurarse de que existe la sección de autor
-    if 'author' not in yaml_dict:
-        yaml_dict['author'] = {}
+    # Asegurarse de que existe la estructura metadata.author según el esquema
+    if 'metadata' not in yaml_dict:
+        yaml_dict['metadata'] = {}
+    if 'author' not in yaml_dict['metadata']:
+        yaml_dict['metadata']['author'] = {}
         
     # Actualizar los campos de autor con los datos del usuario actual
     # Si se proporcionaron datos específicos, usarlos; si no, usar los datos del perfil del usuario
     if contact:
-        yaml_dict['author']['contact'] = contact
+        yaml_dict['metadata']['author']['contact'] = contact
     else:
-        yaml_dict['author']['contact'] = current_user.email
+        yaml_dict['metadata']['author']['contact'] = current_user.email
         
     if organization:
-        yaml_dict['author']['organization'] = organization
+        yaml_dict['metadata']['author']['organization'] = organization
     elif current_user.organization:
-        yaml_dict['author']['organization'] = current_user.organization
+        yaml_dict['metadata']['author']['organization'] = current_user.organization
         
     if role:
-        yaml_dict['author']['role'] = role
+        yaml_dict['metadata']['author']['role'] = role
     elif current_user.position:
-        yaml_dict['author']['role'] = current_user.position
+        yaml_dict['metadata']['author']['role'] = current_user.position
         
     # Añadir el nombre completo del usuario al campo name del autor
     if current_user.full_name:
-        yaml_dict['author']['name'] = current_user.full_name
+        yaml_dict['metadata']['author']['name'] = current_user.full_name
         
     # Convertir de nuevo a string YAML
     default_content = yaml.dump(yaml_dict, sort_keys=False, default_flow_style=False)

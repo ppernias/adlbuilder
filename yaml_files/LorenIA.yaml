@@ -1,6 +1,9 @@
 metadata:
   author:
-    name: ''
+    name: "Pedro A Pern\xEDas"
+    contact: p.pernias@gmail.com
+    organization: Universidad de Alicante
+    role: Tenure Professor
   description:
     title: ''
     summary: ''
@@ -36,8 +39,3 @@ assistant_instructions:
           \ Citations] \u2192 [Provide Full References] \u2192 [Verify Credibility]\
           \ \u2192 [Final Answer]**.  Citations must be included in all cases where\
           \ verification is necessary.\n"
-author:
-  contact: p.pernias@gmail.com
-  organization: Universidad de Alicante
-  role: Tenure Professor
-  name: "Pedro A Pern\xEDas"
