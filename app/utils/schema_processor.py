@@ -32,6 +32,7 @@ def process_schema_node(node, path="", category_filter=None, ui_order=1):
 def create_fields_list(schema: Dict[str, Any], path: str = "", category_filter: Optional[str] = None) -> List[Dict[str, Any]]:
     """
     Create a flat list of fields from the schema.
+    Only include leaf nodes (fields that don't have nested properties).
     """
     fields = []
     
@@ -44,25 +45,37 @@ def create_fields_list(schema: Dict[str, Any], path: str = "", category_filter: 
             if category_filter and "x-category" in prop_value and prop_value["x-category"] != category_filter:
                 continue
             
-            # Add this field to the list
-            field_info = {
-                "path": new_path,
-                "title": prop_value.get("title", prop_name),
-                "type": prop_value.get("type", "string"),
-                "description": prop_value.get("description", ""),
-                "required": prop_name in schema.get("required", []),
-                "category": prop_value.get("x-category")
-            }
-            fields.append(field_info)
+            # Check if this is a leaf node (no nested properties)
+            is_leaf_node = "properties" not in prop_value and not (
+                prop_value.get("type") == "array" and 
+                "items" in prop_value and 
+                isinstance(prop_value["items"], dict) and 
+                "properties" in prop_value["items"]
+            )
             
-            # Recursively process child fields
-            if "properties" in prop_value:
+            # Only add leaf nodes to the fields list
+            if is_leaf_node:
+                field_info = {
+                    "path": new_path,
+                    "title": prop_value.get("title", prop_name),
+                    "type": prop_value.get("type", "string"),
+                    "description": prop_value.get("description", ""),
+                    "required": prop_name in schema.get("required", []),
+                    "category": prop_value.get("x-category")
+                }
+                # Add additional information for array types
+                if prop_value.get("type") == "array":
+                    field_info["isArray"] = True
+                    if "items" in prop_value and isinstance(prop_value["items"], dict):
+                        field_info["itemType"] = prop_value["items"].get("type", "string")
+                        if "enum" in prop_value["items"]:
+                            field_info["enum"] = prop_value["items"]["enum"]
+                fields.append(field_info)
+            # Recursively process child fields SOLO para objetos normales
+            if prop_value.get("type") != "array" and "properties" in prop_value:
                 fields.extend(create_fields_list(prop_value, new_path, category_filter))
-            
-            # Process array items
-            if prop_value.get("type") == "array" and "items" in prop_value and isinstance(prop_value["items"], dict):
-                array_path = f"{new_path}[]"
-                fields.extend(create_fields_list({"properties": {"item": prop_value["items"]}}, array_path, category_filter))
+            # NO añadir subcampos 'item' para arrays (eliminado)
+
     
     return fields
 

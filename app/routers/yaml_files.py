@@ -201,7 +201,8 @@ async def create_new_yaml_file(
         "success": True,
         "message": f"File {filename} created successfully with default values",
         "filename": filename,
-        "mode": mode
+        "mode": mode,
+        "content": default_content
     }
 
 @router.get("/yaml-files-edit/{filename}", response_model=Dict[str, Any])

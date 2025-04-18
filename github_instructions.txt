@@ -1,0 +1,42 @@
+# Instrucciones para subir el repositorio a GitHub
+
+## 1. Crear un nuevo repositorio en GitHub
+
+1. Ve a https://github.com/new
+2. Nombre del repositorio: adlbuilder
+3. Descripción: Aplicación web para la creación y edición de asistentes de lenguaje definidos en archivos YAML
+4. Selecciona "Público"
+5. NO inicialices el repositorio con README, .gitignore o licencia
+6. Haz clic en "Crear repositorio"
+
+## 2. Conectar tu repositorio local con GitHub
+
+Una vez creado el repositorio en GitHub, ejecuta estos comandos en tu terminal:
+
+```bash
+# Asegúrate de estar en el directorio del proyecto
+cd /root/adlbuilder
+
+# Agrega el repositorio remoto (reemplaza TU_USUARIO con tu nombre de usuario de GitHub)
+git remote add origin https://github.com/TU_USUARIO/adlbuilder.git
+
+# Sube los cambios al repositorio remoto
+git push -u origin master
+```
+
+## 3. Autenticación en GitHub
+
+Cuando ejecutes el comando `git push`, te pedirá tu nombre de usuario y contraseña de GitHub.
+Si tienes habilitada la autenticación de dos factores, deberás usar un token de acceso personal en lugar de tu contraseña.
+
+Para crear un token de acceso personal:
+1. Ve a https://github.com/settings/tokens
+2. Haz clic en "Generate new token"
+3. Dale un nombre descriptivo como "ADL Builder"
+4. Selecciona los permisos "repo" (acceso completo a repositorios)
+5. Haz clic en "Generate token"
+6. Copia el token generado y úsalo como contraseña cuando git te lo solicite
+
+## 4. Verificar que todo esté correcto
+
+Después de hacer push, ve a la URL de tu repositorio en GitHub para verificar que todos los archivos se hayan subido correctamente.

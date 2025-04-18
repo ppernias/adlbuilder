@@ -21,6 +21,7 @@ def init_user_db():
         hashed_password TEXT NOT NULL,
         role TEXT NOT NULL,
         organization TEXT,
+        position TEXT,
         is_active INTEGER DEFAULT 1,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL
@@ -92,38 +93,36 @@ def get_user_by_id(user_id: int) -> Optional[User]:
 
 def create_user(user: UserCreate) -> User:
     """Create a new user"""
-    # Check if user already exists
     if get_user(user.email):
         raise ValueError("Email already registered")
-    
-    # Hash the password
+
     hashed_password = get_password_hash(user.password)
-    
-    # Current timestamp
     now = datetime.now().isoformat()
-    
+
     conn = sqlite3.connect(str(USER_DB_PATH))
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    
-    # Insert the user
+
+    # Determinar el rol automáticamente
+    cursor.execute("SELECT COUNT(*) FROM users")
+    user_count = cursor.fetchone()[0]
+    assigned_role = "admin" if user_count == 0 else "editor"
+
     cursor.execute(
-        "INSERT INTO users (email, hashed_password, role, organization, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        (user.email, hashed_password, user.role, user.organization, True, now, now)
+        "INSERT INTO users (email, hashed_password, role, organization, position, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (user.email, hashed_password, assigned_role, user.organization, user.position, True, now, now)
     )
-    
-    # Get the user ID
+
     user_id = cursor.lastrowid
-    
     conn.commit()
     conn.close()
-    
-    # Return the created user
+
     return User(
         id=user_id,
         email=user.email,
-        role=user.role,
+        role=assigned_role,
         organization=user.organization,
+        position=user.position,
         is_active=True,
         hashed_password=hashed_password,
         created_at=datetime.fromisoformat(now),
@@ -159,6 +158,10 @@ def update_user(user_id: int, user_data: Dict[str, Any]) -> Optional[User]:
     if "organization" in user_data:
         update_fields.append("organization = ?")
         params.append(user_data["organization"])
+
+    if "position" in user_data:
+        update_fields.append("position = ?")
+        params.append(user_data["position"])
     
     if "is_active" in user_data:
         update_fields.append("is_active = ?")

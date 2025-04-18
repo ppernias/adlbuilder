@@ -1,0 +1,124 @@
+@import './variables.css';
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  margin: 0;
+  padding: 0;
+}
+
+/* Personalizar componentes de Bootstrap */
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+.btn-outline-primary {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-outline-primary:hover, .btn-outline-primary:focus {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.card {
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.navbar {
+  background-color: var(--color-primary);
+}
+
+.navbar-brand, .navbar-nav .nav-link {
+  color: white;
+}
+
+.navbar-nav .nav-link:hover {
+  color: var(--color-gray-light);
+}
+
+.form-control:focus {
+  border-color: var(--color-primary-light);
+  box-shadow: 0 0 0 0.25rem rgba(138, 96, 56, 0.25);
+}
+
+/* Clases de utilidad */
+.bg-primary-light {
+  background-color: var(--color-primary-light);
+}
+
+.text-primary-dark {
+  color: var(--color-primary-dark);
+}
+
+.bg-accent {
+  background-color: var(--color-accent);
+}
+
+.border-primary {
+  border-color: var(--color-primary) !important;
+}
+
+/* Estilos para el dashboard */
+.assistant-card {
+  transition: transform 0.2s ease;
+}
+
+.assistant-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Estilos para el editor */
+.editor-container {
+  background-color: white;
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.mode-selector {
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Estilos para formularios */
+.form-section {
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  background-color: white;
+}
+
+.form-section-title {
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-primary-light);
+  padding-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Toast notifications */
+.toast {
+  background-color: white;
+  border-left: 4px solid var(--color-primary);
+}
+
+.toast-error {
+  border-left-color: #dc3545;
+}
+
+.toast-success {
+  border-left-color: #28a745;
+}

@@ -16,7 +16,8 @@ async def admin_list_users(
     current_user: User = Depends(get_current_admin_user)
 ):
     """List all users (admin only)"""
-    return list_users(skip, limit)
+    users = list_users(skip, limit)
+    return [UserResponse(**user.dict()) for user in users]
 
 @router.get("/users/{user_id}", response_model=UserResponse)
 async def admin_get_user(

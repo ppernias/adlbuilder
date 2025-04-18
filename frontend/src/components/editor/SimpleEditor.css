@@ -1,0 +1,37 @@
+.section-header {
+  background: #e8dacb; /* moka palette light brown */
+  color: #4d3e2a;     /* moka palette dark brown */
+  padding: 0.85rem 1.2rem;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  font-weight: 700;
+  font-size: 1.13rem;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(77, 62, 42, 0.05);
+  border-left: 5px solid #b79b72;
+}
+
+.array-control {
+  background: #f9f6f2;
+  border: 1px solid #e8dacb;
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+}
+.array-control .d-flex {
+  margin-bottom: 0.5rem;
+}
+.array-control .form-control {
+  background: #fff;
+  border-color: #b79b72;
+}
+.array-control .btn-outline-danger {
+  border-color: #e6b8b8;
+}
+.array-control .btn-outline-primary {
+  border-color: #b79b72;
+  color: #6d4c1b;
+}
+.array-control .btn-outline-primary:hover {
+  background: #e8dacb;
+}
