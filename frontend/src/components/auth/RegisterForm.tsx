@@ -12,13 +12,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onRegister, isLoading, erro
   const [userData, setUserData] = useState<UserRegister>({
     email: '',
     password: '',
+    full_name: '',
     organization: '',
     position: ''
   });
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUserData(prev => ({
       ...prev,
@@ -50,6 +51,17 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onRegister, isLoading, erro
             onChange={handleChange}
             placeholder="Enter your email"
             required
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3" controlId="formFullName">
+          <Form.Label>Full Name</Form.Label>
+          <Form.Control
+            type="text"
+            name="full_name"
+            value={userData.full_name}
+            onChange={handleChange}
+            placeholder="Enter your full name"
           />
         </Form.Group>
 

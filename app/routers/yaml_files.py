@@ -165,6 +165,9 @@ async def get_history_detail_endpoint(history_id: int):
 async def create_new_yaml_file(
     filename: str = Query(..., description="Name of the file to create"),
     mode: Literal["simple", "advanced"] = Query("simple", description="Mode for creating the file (simple or advanced)"),
+    contact: str = Query(None, description="Author contact information"),
+    organization: str = Query(None, description="Author organization"),
+    role: str = Query(None, description="Author role"),
     background_tasks: BackgroundTasks = None,
     current_user: User = Depends(get_current_active_user)
 ):
@@ -179,6 +182,37 @@ async def create_new_yaml_file(
     
     # Generate default YAML content based on schema
     default_content = generate_default_yaml_from_schema(schema_data["schema"])
+    
+    # Convertir el YAML a un diccionario para modificarlo
+    yaml_dict = yaml.safe_load(default_content)
+    
+    # Asegurarse de que existe la sección de autor
+    if 'author' not in yaml_dict:
+        yaml_dict['author'] = {}
+        
+    # Actualizar los campos de autor con los datos del usuario actual
+    # Si se proporcionaron datos específicos, usarlos; si no, usar los datos del perfil del usuario
+    if contact:
+        yaml_dict['author']['contact'] = contact
+    else:
+        yaml_dict['author']['contact'] = current_user.email
+        
+    if organization:
+        yaml_dict['author']['organization'] = organization
+    elif current_user.organization:
+        yaml_dict['author']['organization'] = current_user.organization
+        
+    if role:
+        yaml_dict['author']['role'] = role
+    elif current_user.position:
+        yaml_dict['author']['role'] = current_user.position
+        
+    # Añadir el nombre completo del usuario al campo name del autor
+    if current_user.full_name:
+        yaml_dict['author']['name'] = current_user.full_name
+        
+    # Convertir de nuevo a string YAML
+    default_content = yaml.dump(yaml_dict, sort_keys=False, default_flow_style=False)
     
     # Save the file directly without using save_yaml_file
     with open(file_path, "w") as f:

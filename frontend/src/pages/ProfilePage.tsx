@@ -11,6 +11,7 @@ interface ProfilePageProps {
 const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUserUpdate }) => {
   const [userData, setUserData] = useState<UserUpdate>({
     email: '',
+    full_name: '',
     organization: '',
     position: '',
   });
@@ -33,6 +34,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUserUpdate }) => {
     if (user) {
       setUserData({
         email: user.email,
+        full_name: user.full_name || '',
         organization: user.organization,
         position: user.position || '',
       });
@@ -142,6 +144,17 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUserUpdate }) => {
                     onChange={handleProfileChange}
                     placeholder="Enter your email"
                     required
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3" controlId="formFullName">
+                  <Form.Label>Full Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="full_name"
+                    value={userData.full_name}
+                    onChange={handleProfileChange}
+                    placeholder="Enter your full name"
                   />
                 </Form.Group>
 

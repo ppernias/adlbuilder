@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Container, Alert, Spinner, Button } from 'react-bootstrap';
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import EditorModeSelector from '../components/editor/EditorModeSelector';
 import SimpleEditor from '../components/editor/SimpleEditor';
 import AdvancedEditor from '../components/editor/AdvancedEditor';
@@ -22,6 +22,9 @@ const EditorPage: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(!filename);
+
+  // No necesitamos obtener los datos del usuario actual aquí
+  // El backend obtendrá automáticamente los datos del usuario actual
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,6 +81,9 @@ const EditorPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
+      // No necesitamos crear un objeto con la información del autor aquí
+      // El backend obtendrá automáticamente los datos del usuario actual
+      
       // Create new file with user-provided filename
       const newFileData = await yamlAPI.createNewYAMLFile(newFilename, mode);
       setYamlContent(newFileData.content);
@@ -189,7 +195,7 @@ const EditorPage: React.FC = () => {
             navigate('/dashboard');
           }
         }} 
-        onConfirm={handleCreateAssistant} 
+        onConfirm={handleCreateAssistant}
       />
     </Container>
   );

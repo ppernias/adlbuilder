@@ -4,6 +4,7 @@
 export interface User {
   id: number;
   email: string;
+  full_name?: string;
   role: 'admin' | 'editor';
   organization?: string;
   position?: string;
@@ -30,12 +31,14 @@ export interface UserLogin {
 export interface UserRegister {
   email: string;
   password: string;
+  full_name?: string;
   organization: string;
   position?: string;
 }
 
 export interface UserUpdate {
   email?: string;
+  full_name?: string;
   role?: 'admin' | 'editor'; // sigue opcional, pero no lo pidas en registro
   organization?: string;
   position?: string;

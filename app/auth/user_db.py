@@ -20,6 +20,7 @@ def init_user_db():
         email TEXT UNIQUE NOT NULL,
         hashed_password TEXT NOT NULL,
         role TEXT NOT NULL,
+        full_name TEXT,
         organization TEXT,
         position TEXT,
         is_active INTEGER DEFAULT 1,
@@ -109,8 +110,8 @@ def create_user(user: UserCreate) -> User:
     assigned_role = "admin" if user_count == 0 else "editor"
 
     cursor.execute(
-        "INSERT INTO users (email, hashed_password, role, organization, position, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        (user.email, hashed_password, assigned_role, user.organization, user.position, True, now, now)
+        "INSERT INTO users (email, hashed_password, role, full_name, organization, position, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (user.email, hashed_password, assigned_role, user.full_name, user.organization, user.position, True, now, now)
     )
 
     user_id = cursor.lastrowid
@@ -121,6 +122,7 @@ def create_user(user: UserCreate) -> User:
         id=user_id,
         email=user.email,
         role=assigned_role,
+        full_name=user.full_name,
         organization=user.organization,
         position=user.position,
         is_active=True,
@@ -155,6 +157,10 @@ def update_user(user_id: int, user_data: Dict[str, Any]) -> Optional[User]:
         update_fields.append("role = ?")
         params.append(user_data["role"])
     
+    if "full_name" in user_data:
+        update_fields.append("full_name = ?")
+        params.append(user_data["full_name"])
+        
     if "organization" in user_data:
         update_fields.append("organization = ?")
         params.append(user_data["organization"])

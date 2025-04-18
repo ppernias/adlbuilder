@@ -69,6 +69,7 @@ const AdminUsersPage: React.FC = () => {
             <tr>
               <th>ID</th>
               <th>Email</th>
+              <th>Full Name</th>
               <th>Role</th>
               <th>Organization</th>
               <th>Position</th>
@@ -81,6 +82,7 @@ const AdminUsersPage: React.FC = () => {
               <tr key={user.id}>
                 <td>{user.id}</td>
                 <td>{user.email}</td>
+                <td>{user.full_name || '-'}</td>
                 <td>
                   <Form.Select
                     value={user.role}

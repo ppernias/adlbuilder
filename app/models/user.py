@@ -8,6 +8,7 @@ VALID_ROLES = ["admin", "editor"]
 # User models
 class UserBase(BaseModel):
     email: EmailStr
+    full_name: Optional[str] = Field(None, description="User's full name")
     role: Optional[str] = Field(None, description="User role")
     organization: Optional[str] = Field(None, description="User organization")
     position: Optional[str] = Field(None, description="User position in the organization")
@@ -26,6 +27,7 @@ class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     password: Optional[str] = None
     role: Optional[str] = None
+    full_name: Optional[str] = None
     organization: Optional[str] = None
     position: Optional[str] = None
     is_active: Optional[bool] = None

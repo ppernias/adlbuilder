@@ -129,7 +129,8 @@ export const yamlAPI = {
   },
 
   createNewYAMLFile: async (filename: string, mode: 'simple' | 'advanced') => {
-    const response = await api.get(`/yaml-files-new?filename=${filename}&mode=${mode}`);
+    const url = `/yaml-files-new?filename=${filename}&mode=${mode}`;
+    const response = await api.get(url);
     return response.data;
   },
 
